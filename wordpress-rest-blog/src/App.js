@@ -22,7 +22,10 @@ function App() {
         </div>
       </div>
       <footer>
-        <a href="#">Back to top</a>
+        {
+          //eslint-disable-next-line
+          <a href="#">Back to top</a>
+        }
       </footer>
     </React.Fragment>
   );
