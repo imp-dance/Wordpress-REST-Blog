@@ -1,6 +1,7 @@
 import React from "react";
 import "../App.css";
 import axios from "axios";
+import WordpressConfig from "../WordpressConfig";
 class Header extends React.Component {
   componentDidMount() {
     axios
@@ -17,13 +18,14 @@ class Header extends React.Component {
     siteTitle: "Loading...",
     siteDescription: "..."
   };
-  goToIndex = () => {
-    window.location.href = "/";
-  };
   render() {
     return (
-      <header>
-        <h1 onClick={this.goToIndex}>{this.state.siteTitle}</h1>
+      <header
+        className={this.state.siteTitle === "Loading..." ? "loading" : "loaded"}
+      >
+        <a href={WordpressConfig.baseName}>
+          <h1>{this.state.siteTitle}</h1>
+        </a>
         <p>{this.state.siteDescription}</p>
       </header>
     );
