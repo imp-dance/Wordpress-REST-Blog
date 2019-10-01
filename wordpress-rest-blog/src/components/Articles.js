@@ -92,6 +92,11 @@ class Articles extends React.Component {
       this.scrollToTop();
     }
   }
+  goToArticle = event => {
+    window.location.href = `${
+      this.props.WPConfig.baseName
+    }post/${event.target.parentElement.getAttribute("data-id")}`;
+  };
   sortArticles = event => {
     let categoryID = event.target.getAttribute("data-categoryid");
     this.setState({ sortArticles: categoryID });
@@ -118,10 +123,16 @@ class Articles extends React.Component {
     this.setState({ newComments: newCommentState });
   };
   goToMusic = () => {
-    window.location.href = "https://soundcloud.com/sl1ck";
+    window.open("https://soundcloud.com/sl1ck", "_blank");
   };
   goToCV = () => {
-    window.location.href = "https://haakon.underbakke.net/cv";
+    window.open("https://haakon.underbakke.net/cv", "_blank");
+  };
+  goToContact = () => {
+    window.location.href = "https://impedans.me/web/contact-me/";
+  };
+  ignoreAction = event => {
+    event.preventDefault();
   };
   render() {
     let render = [];
@@ -144,6 +155,9 @@ class Articles extends React.Component {
             {categoryItems}
             <li>
               <button onClick={this.goToMusic}>Music</button>
+            </li>
+            <li>
+              <button onClick={this.goToContact}>Contact</button>
             </li>
             <li>
               <button onClick={this.goToCV}>CV</button>
@@ -171,38 +185,54 @@ class Articles extends React.Component {
           className = "open"; // Latest article should be open on index
           body = this.reactParse(blogPost.content.rendered);
         }
-        render.push(
-          <article key={index} className={className}>
-            <Link to={"/post/" + blogPost.id} className="articleLink">
-              <h3
+        if (!blogPost.categories.includes(1)) {
+          render.push(
+            <article key={index} className={className} data-id={blogPost.id}>
+              <Link
+                to={"/post/" + blogPost.id}
+                data-id={blogPost.id}
+                className="articleLink"
+              >
+                <h3
+                  data-id={blogPost.id}
+                  dangerouslySetInnerHTML={{
+                    __html: title
+                  }}
+                ></h3>
+              </Link>
+              <div
+                className="body"
+                onClick={
+                  this.state.postID === false
+                    ? this.goToArticle
+                    : this.ignoreAction
+                }
+                data-id={blogPost.id}
                 dangerouslySetInnerHTML={{
-                  __html: title
+                  __html: body
                 }}
-              ></h3>
-            </Link>
-            <div
-              className="body"
-              dangerouslySetInnerHTML={{
-                __html: body
-              }}
-            ></div>
-          </article>
-        );
+              ></div>
+            </article>
+          );
+        }
       }
     });
     if (this.state.postID !== false) {
       // A specific post is open
-      document.title =
-        this.reactParse(this.state.blogPosts[0].title.rendered) +
-        " - Håkon Underbakke";
-      let newMetaDescription = this.reactParse(
-        this.state.blogPosts[0].excerpt.rendered
-      );
-      newMetaDescription = newMetaDescription.substring(3);
-      newMetaDescription = newMetaDescription.slice(0, -5);
-      document
-        .querySelector('meta[name="description"]')
-        .setAttribute("content", newMetaDescription);
+      if (this.state.blogPosts[0].title.rendered !== "") {
+        // update meta-data
+        document.title =
+          this.reactParse(this.state.blogPosts[0].title.rendered) +
+          " - Håkon Underbakke";
+        let newMetaDescription = this.reactParse(
+          this.state.blogPosts[0].excerpt.rendered
+        );
+        newMetaDescription = newMetaDescription.substring(3);
+        newMetaDescription = newMetaDescription.slice(0, -5);
+        document
+          .querySelector('meta[name="description"]')
+          .setAttribute("content", newMetaDescription);
+      }
       let parentComments = this.state.comments.filter(
         comment => comment.parent === 0
       );
@@ -219,6 +249,8 @@ class Articles extends React.Component {
       );
       if (this.state.comments.length === 1) {
         render.push(<h4 key={9999}>1 Comment</h4>);
+      } else if (this.state.comments.length === 0) {
+        render.push(<h4 key={9999}>Be the first to leave a comment</h4>);
       } else {
         render.push(<h4 key={9999}>{this.state.comments.length} Comments</h4>);
       }
@@ -256,7 +288,7 @@ class Articles extends React.Component {
     }
     return (
       <React.Fragment>
-        {!this.state.loaded && <main>Loading...</main>}
+        {!this.state.loaded && <main className="showLoading">Loading...</main>}
         <main className={this.state.loaded ? "loaded" : "loading"}>
           {render}
         </main>

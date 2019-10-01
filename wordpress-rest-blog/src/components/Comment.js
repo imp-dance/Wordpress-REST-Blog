@@ -77,9 +77,11 @@ class Comment extends React.Component {
           dangerouslySetInnerHTML={{ __html: body }}
         />
         <i className="comment-date">
-          <button onClick={this.showReply}>
-            {this.state.isReplying ? "Cancel" : "Reply"}
-          </button>{" "}
+          {this.props.comment.customStatus !== "pending" && (
+            <button onClick={this.showReply}>
+              {this.state.isReplying ? "Cancel" : "Reply"}
+            </button>
+          )}
           {date}
         </i>
         {this.state.isReplying && (

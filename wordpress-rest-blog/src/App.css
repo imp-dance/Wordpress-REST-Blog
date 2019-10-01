@@ -1,6 +1,9 @@
 body {
   font-size: 16px;
 }
+#root {
+  border-top: 10px solid #2a3b56;
+}
 *,
 *:before,
 *:after {
@@ -33,6 +36,7 @@ article.open {
 }
 article.collapsed {
   position: relative;
+  cursor: pointer;
 }
 article.collapsed:after {
   content: "";
@@ -44,6 +48,12 @@ article.collapsed:after {
   height: 100px;
   background: linear-gradient(to top, #fff, rgba(255, 255, 255, 0.1));
   pointer-events: none;
+}
+article.collapsed:hover:after {
+  height: 60px;
+}
+article.collapsed:hover > .articleLink h3 {
+  border-bottom-color: transparent;
 }
 article img {
   max-width: 100%;
@@ -109,6 +119,9 @@ blockquote {
   margin: 20px 0 40px;
   background-size: cover;
 }
+.showLoading {
+  text-align: center;
+}
 .articleLink {
   color: rgb(6, 18, 59);
   text-decoration: none;
@@ -137,6 +150,10 @@ footer a {
 footer a:hover {
   text-decoration: none;
 }
+header,
+nav {
+  text-align: center;
+}
 nav {
   border-bottom: 1px solid #eee;
   border-top: 1px solid #eee;
@@ -145,6 +162,7 @@ nav {
   display: block;
   background: #fff;
   z-index: 9900;
+  margin-bottom: 100px;
 }
 nav ul {
   list-style: none;
@@ -203,14 +221,12 @@ article a:hover {
   border-top-left-radius: 90px;
   border-bottom-left-radius: 90px;
 }
-.comment.pending .comment-header {
-  background: #000;
-}
 .comment.pending .comment-username:after {
-  content: " (Comment is pending)";
+  content: " (You)";
   font-size: 0.9em;
   margin-left: 10px;
   font-style: italic;
+  opacity: 0.5;
 }
 .comment-header em {
   display: block;
@@ -274,7 +290,7 @@ article a:hover {
 }
 .comment-poster {
   margin: 0 0 60px;
-  background: #f3f7ff;
+  background: transparent;
   padding: 20px;
 }
 .comment-poster table {
@@ -289,9 +305,14 @@ article a:hover {
   width: 100%;
   padding: 5px;
   font-size: 1em;
-  outline-color: rgb(18, 44, 128);
+  outline: none;
   resize: none;
   border: 1px solid rgb(48, 66, 126);
+}
+.comment-poster input[type="text"]:focus,
+.comment-poster input[type="email"]:focus,
+.comment-poster textarea:focus {
+  border-color: #000;
 }
 .comment-poster-error {
   background: #b51717;
@@ -333,4 +354,35 @@ article a:hover {
 .wp-block-code code {
   width: 100%;
   overflow-x: auto;
+}
+
+/* animations */
+article {
+  animation: articleAnimation 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+@keyframes articleAnimation {
+  from {
+    transform: scale(1.02) translate(0px, -10px);
+    opacity: 0;
+  }
+}
+h1 {
+  animation: h1Animation 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+@keyframes h1Animation {
+  from {
+    transform: translate(0px, 10px);
+    opacity: 0;
+  }
+}
+/* responsive design */
+@media screen and (max-width: 400px) {
+  h1 {
+    font-size: 3.5em;
+  }
+}
+@media screen and (max-width: 330px) {
+  body {
+    font-size: 12px;
+  }
 }
