@@ -5,6 +5,7 @@ import CommentPoster from "./CommentPoster";
 import "../App.css";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import {
   FacebookShareButton,
   RedditShareButton,
@@ -221,7 +222,7 @@ class Articles extends React.Component {
       // A specific post is open
       if (this.state.blogPosts[0].title.rendered !== "") {
         // update meta-data
-        document.title =
+        /* document.title =
           this.reactParse(this.state.blogPosts[0].title.rendered) +
           " - Håkon Underbakke";
         let newMetaDescription = this.reactParse(
@@ -231,7 +232,19 @@ class Articles extends React.Component {
         newMetaDescription = newMetaDescription.slice(0, -5);
         document
           .querySelector('meta[name="description"]')
-          .setAttribute("content", newMetaDescription);
+          .setAttribute("content", newMetaDescription); */
+        let metaDescription = this.reactParse(
+          this.state.blogPosts[0].excerpt.rendered
+        );
+        metaDescription = metaDescription.substring(3);
+        metaDescription = metaDescription.slice(0, -5);
+        let title = this.reactParse(this.state.blogPosts[0].title.rendered);
+        render.push(
+          <Helmet>
+            <title>{title}</title>
+            <meta name="description" content={metaDescription} />
+          </Helmet>
+        );
       }
       let parentComments = this.state.comments.filter(
         comment => comment.parent === 0
