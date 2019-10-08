@@ -110,7 +110,8 @@ class Articles extends React.Component {
   reactParse = parse => {
     let HTMLToReactParser = new HtmlToReactParser();
     let reactElement = HTMLToReactParser.parse(parse);
-    return ReactDOMServer.renderToStaticMarkup(reactElement);
+    let string = ReactDOMServer.renderToStaticMarkup(reactElement);
+    return string.replace("<code>", "<code class='markUpBaby'>");
   };
   parseDate = date => {
     let y = date.substring(0, 4);
@@ -135,38 +136,51 @@ class Articles extends React.Component {
   ignoreAction = event => {
     event.preventDefault();
   };
+  goHome = () => {
+    window.location.href = "/";
+  };
   render() {
     let render = [];
-    if (this.state.postID === false) {
-      let categoryItems = [];
-      this.state.categories.forEach((category, index) => {
-        if (category.id !== 1) {
-          categoryItems.push(
-            <li key={888 + index} data-id={category.id}>
-              <button onClick={this.sortArticles} data-categoryid={category.id}>
-                {category.name}
-              </button>
-            </li>
-          );
-        }
-      });
-      render.push(
-        <nav key={9991}>
-          <ul>
-            {categoryItems}
-            <li>
-              <button onClick={this.goToMusic}>Music</button>
-            </li>
-            <li>
-              <button onClick={this.goToContact}>Contact</button>
-            </li>
-            <li>
-              <button onClick={this.goToCV}>CV</button>
-            </li>
-          </ul>
-        </nav>
+    let categoryItems = [];
+    this.state.categories.forEach((category, index) => {
+      if (category.id !== 1) {
+        categoryItems.push(
+          <li key={1888 + index} data-id={category.id}>
+            <button onClick={this.sortArticles} data-categoryid={category.id}>
+              {category.name}
+            </button>
+          </li>
+        );
+      }
+    });
+    if (this.state.postID !== false) {
+      categoryItems.push(
+        <li key={1923}>
+          <button onClick={this.goHome}>All posts</button>
+        </li>
       );
     }
+    categoryItems.push(
+      <li key={1923} className="seperator">
+        |
+      </li>
+    );
+    render.push(
+      <nav key={9991}>
+        <ul>
+          {categoryItems}
+          <li>
+            <button onClick={this.goToMusic}>Music</button>
+          </li>
+          <li>
+            <button onClick={this.goToContact}>Contact</button>
+          </li>
+          <li>
+            <button onClick={this.goToCV}>CV</button>
+          </li>
+        </ul>
+      </nav>
+    );
     this.state.blogPosts.forEach((blogPost, index) => {
       if (
         this.state.sortArticles === null ||
@@ -182,10 +196,10 @@ class Articles extends React.Component {
           body = body.substring(0, body.length - 9) + "...</p>";
         }
         let className = this.state.postID === false ? "collapsed" : "open";
-        if (index === 0 && this.state.sortArticles === null) {
+        /*if (index === 0 && this.state.sortArticles === null) {
           className = "open"; // Latest article should be open on index
           body = this.reactParse(blogPost.content.rendered);
-        }
+        }*/
         if (!blogPost.categories.includes(1)) {
           render.push(
             <article key={index} className={className} data-id={blogPost.id}>
@@ -240,7 +254,7 @@ class Articles extends React.Component {
         metaDescription = metaDescription.slice(0, -5);
         let title = this.reactParse(this.state.blogPosts[0].title.rendered);
         render.push(
-          <Helmet>
+          <Helmet key="123653">
             <title>{title}</title>
             <meta name="description" content={metaDescription} />
           </Helmet>
@@ -301,7 +315,9 @@ class Articles extends React.Component {
     }
     return (
       <React.Fragment>
-        {!this.state.loaded && <main className="showLoading">Loading...</main>}
+        {!this.state.loaded && (
+          <main className="showLoading">Fetching content...</main>
+        )}
         <main className={this.state.loaded ? "loaded" : "loading"}>
           {render}
         </main>

@@ -1,5 +1,5 @@
 body {
-  font-size: 16px;
+  font-size: 17px;
 }
 #root {
   border-top: 10px solid #2a3b56;
@@ -21,7 +21,7 @@ button {
   cursor: pointer;
 }
 .App {
-  max-width: 800px;
+  max-width: 830px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -59,13 +59,14 @@ article img {
   max-width: 100%;
 }
 h1 {
-  font-size: 4em;
+  font-size: 3.5em;
   margin: 20px 0 0;
   cursor: pointer;
 }
 header {
-  margin: 0 0 60px;
-  padding: 100px 0;
+  /* 
+  margin: 0 0 60px; */
+  padding: 70px 0;
 }
 header a {
   color: #2a3b56;
@@ -121,6 +122,8 @@ blockquote {
 }
 .showLoading {
   text-align: center;
+  padding-top: 100px;
+  color: rgb(83, 82, 97);
 }
 .articleLink {
   color: rgb(6, 18, 59);
@@ -130,6 +133,10 @@ blockquote {
 article.open .articleLink,
 nav ul li button:hover {
   color: rgb(11, 31, 97);
+}
+.seperator {
+  padding: 0 20px 0 0;
+  color: #aaa;
 }
 .articleLink:hover h3,
 article.open .articleLink h3 {
@@ -185,7 +192,7 @@ nav li button {
 code {
   font-size: 0.8em;
   display: inline-block;
-  background: #eee;
+  background: #f1ebe5;
   padding: 0 5px;
   border-radius: 2px;
 }
@@ -353,7 +360,11 @@ article a:hover {
 }
 .wp-block-code code {
   width: 100%;
-  overflow-x: auto;
+  padding: 10px;
+  overflow-y: auto;
+  color: #103a58;
+  background: #f6fbff;
+  line-height: 1.5em;
 }
 
 /* animations */
