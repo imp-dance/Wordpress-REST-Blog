@@ -32,11 +32,12 @@ article {
 article.open {
   padding-bottom: 60px;
   margin: 0 0 40px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgb(242, 242, 247);
 }
 article.collapsed {
   position: relative;
   cursor: pointer;
+  margin-bottom: 100px;
 }
 article.collapsed:after {
   content: "";
@@ -53,7 +54,7 @@ article.collapsed:hover:after {
   height: 60px;
 }
 article.collapsed:hover > .articleLink h3 {
-  border-bottom-color: transparent;
+  border-bottom-color: rgb(152, 158, 206);
 }
 article img {
   max-width: 100%;
@@ -66,7 +67,7 @@ h1 {
 header {
   /* 
   margin: 0 0 60px; */
-  padding: 70px 0;
+  padding: 50px 0 60px;
 }
 header a {
   color: #2a3b56;
@@ -170,11 +171,15 @@ nav {
   background: #fff;
   z-index: 9900;
   margin-bottom: 100px;
+  font-size: 0.8em;
 }
 nav ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 nav li {
   display: inline-block;
