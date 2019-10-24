@@ -369,6 +369,7 @@ article a:hover {
   overflow-y: auto;
   color: #103a58;
   background: #f6fbff;
+  border: 1px solid #d5dde4;
   line-height: 1.5em;
 }
 
