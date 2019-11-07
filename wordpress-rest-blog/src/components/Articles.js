@@ -125,7 +125,7 @@ class Articles extends React.Component {
     this.setState({ newComments: newCommentState });
   };
   goToMusic = () => {
-    window.open("https://soundcloud.com/sl1ck", "_blank");
+    window.location.href = "/blog/post/128";
   };
   goToCV = () => {
     window.open("https://haakon.underbakke.net/cv", "_blank");
@@ -145,8 +145,17 @@ class Articles extends React.Component {
     this.state.categories.forEach((category, index) => {
       if (category.id !== 1) {
         categoryItems.push(
-          <li key={1888 + index} data-id={category.id}>
-            <button onClick={this.sortArticles} data-categoryid={category.id}>
+          <li key={"art" + 1888 + index} data-id={category.id}>
+            <button
+              onClick={this.sortArticles}
+              data-categoryid={category.id}
+              className={
+                this.state.sortArticles === null ||
+                parseInt(this.state.sortArticles) === parseInt(category.id)
+                  ? "white"
+                  : "gray"
+              }
+            >
               {category.name}
             </button>
           </li>
@@ -155,22 +164,26 @@ class Articles extends React.Component {
     });
     if (this.state.postID !== false) {
       categoryItems.push(
-        <li key={1923}>
-          <button onClick={this.goHome}>All posts</button>
+        <li key={"fart" + 1923}>
+          <button onClick={this.goHome}>&#8249; Articles & Projects</button>
         </li>
       );
     }
     categoryItems.push(
-      <li key={1923} className="seperator">
+      <li key={"bart" + 1923} className="seperator">
         |
       </li>
     );
     render.push(
-      <nav key={9991}>
+      <nav key={"part" + 9991}>
         <ul>
           {categoryItems}
           <li>
-            <button onClick={this.goToMusic}>Music</button>
+            <Link to="/post/128">
+              <button onClick={this.state.postID !== false && this.goToMusic}>
+                Music
+              </button>
+            </Link>
           </li>
           <li>
             <button onClick={this.goToContact}>Contact</button>
@@ -200,7 +213,10 @@ class Articles extends React.Component {
           className = "open"; // Latest article should be open on index
           body = this.reactParse(blogPost.content.rendered);
         }*/
-        if (!blogPost.categories.includes(1)) {
+        if (
+          (this.state.postID === false && !blogPost.categories.includes(1)) ||
+          this.state.postID !== false
+        ) {
           render.push(
             <article key={index} className={className} data-id={blogPost.id}>
               <Link
@@ -215,18 +231,34 @@ class Articles extends React.Component {
                   }}
                 ></h3>
               </Link>
-              <div
-                className="body"
-                onClick={
-                  this.state.postID === false
-                    ? this.goToArticle
-                    : this.ignoreAction
-                }
-                data-id={blogPost.id}
-                dangerouslySetInnerHTML={{
-                  __html: body
-                }}
-              ></div>
+              {this.state.postID === false ? (
+                <Link
+                  to={"/post/" + blogPost.id}
+                  data-id={blogPost.id}
+                  className="articleBodyLink"
+                >
+                  <div
+                    className="body"
+                    data-id={blogPost.id}
+                    dangerouslySetInnerHTML={{
+                      __html: body
+                    }}
+                  ></div>
+                </Link>
+              ) : (
+                <div
+                  className="body"
+                  onClick={
+                    this.state.postID === false
+                      ? this.goToArticle
+                      : this.ignoreAction
+                  }
+                  data-id={blogPost.id}
+                  dangerouslySetInnerHTML={{
+                    __html: body
+                  }}
+                ></div>
+              )}
             </article>
           );
         }
@@ -264,9 +296,9 @@ class Articles extends React.Component {
         comment => comment.parent === 0
       );
       let url = window.location.href;
-      render.push(<h5 key={9994}>Share on...</h5>);
+      render.push(<h5 key={"aaart" + 9994}>Share on...</h5>);
       render.push(
-        <div className="social" key={9993}>
+        <div className="social" key={"arts" + 9993}>
           <FacebookShareButton url={url}>Facebook</FacebookShareButton>
           <RedditShareButton url={url}>Reddit</RedditShareButton>
           <LinkedinShareButton url={url}>Linkedin</LinkedinShareButton>
@@ -274,50 +306,54 @@ class Articles extends React.Component {
           <EmailShareButton url={url}>Email</EmailShareButton>
         </div>
       );
-      if (this.state.comments.length === 1) {
-        render.push(<h4 key={9999}>1 Comment</h4>);
-      } else if (this.state.comments.length === 0) {
-        render.push(<h4 key={9999}>Be the first to leave a comment</h4>);
-      } else {
-        render.push(<h4 key={9999}>{this.state.comments.length} Comments</h4>);
-      }
-      render.push(
-        <CommentPoster
-          postID={this.state.postID}
-          onUpdate={this.updateComments}
-          key={9991}
-          WPConfig={this.props.WPConfig}
-          comments={this.state.comments}
-        />
-      );
-      let comments = [];
-      parentComments.forEach((comment, index) => {
-        let parentID = comment.id;
-        let nestedComments = this.state.comments.filter(
-          comment => comment.parent === parentID
-        );
-        comments.push(
-          <Comment
-            comment={comment}
-            index={index}
-            key={index}
+      if (!this.state.blogPosts[0].categories.includes(1)) {
+        if (this.state.comments.length === 1) {
+          render.push(<h4 key={"bbbbart" + 9999}>1 Comment</h4>);
+        } else if (this.state.comments.length === 0) {
+          render.push(
+            <h4 key={"bbbart" + 9999}>Be the first to leave a comment</h4>
+          );
+        } else {
+          render.push(
+            <h4 key={"bbart" + 9999}>{this.state.comments.length} Comments</h4>
+          );
+        }
+        render.push(
+          <CommentPoster
+            postID={this.state.postID}
             onUpdate={this.updateComments}
-            nestedComments={nestedComments}
-            allComments={this.state.comments}
+            key={9991}
+            WPConfig={this.props.WPConfig}
+            comments={this.state.comments}
           />
         );
-      });
-      render.push(
-        <div className="comments-container" key={9998}>
-          {comments}
-        </div>
-      );
+        let comments = [];
+        parentComments.forEach((comment, index) => {
+          let parentID = comment.id;
+          let nestedComments = this.state.comments.filter(
+            comment => comment.parent === parentID
+          );
+          comments.push(
+            <Comment
+              comment={comment}
+              index={index}
+              key={index}
+              onUpdate={this.updateComments}
+              nestedComments={nestedComments}
+              allComments={this.state.comments}
+            />
+          );
+        });
+        render.push(
+          <div className="comments-container" key={9998}>
+            {comments}
+          </div>
+        );
+      }
     }
     return (
       <React.Fragment>
-        {!this.state.loaded && (
-          <main className="showLoading">Fetching content...</main>
-        )}
+        {!this.state.loaded && <main className="showLoading">Loading...</main>}
         <main className={this.state.loaded ? "loaded" : "loading"}>
           {render}
         </main>

@@ -1,6 +1,7 @@
 import React from "react";
 import "../App.css";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import WordpressConfig from "../WordpressConfig";
 class Header extends React.Component {
   componentDidMount() {
@@ -23,9 +24,9 @@ class Header extends React.Component {
       <header
         className={this.state.siteTitle === "Loading..." ? "loading" : "loaded"}
       >
-        <a href={WordpressConfig.baseName}>
+        <Link to={WordpressConfig.baseName}>
           <h1>{this.state.siteTitle}</h1>
-        </a>
+        </Link>
         <p>{this.state.siteDescription}</p>
       </header>
     );

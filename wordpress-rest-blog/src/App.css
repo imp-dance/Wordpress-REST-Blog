@@ -2,7 +2,6 @@ body {
   font-size: 17px;
 }
 #root {
-  border-top: 10px solid #2a3b56;
 }
 *,
 *:before,
@@ -21,9 +20,21 @@ button {
   cursor: pointer;
 }
 .App {
-  max-width: 830px;
   margin: 0 auto;
   padding: 20px;
+}
+.leftContainer {
+  position: sticky;
+  top: 0;
+}
+.right {
+  padding: 0 40px;
+  overflow-x: auto;
+  max-height: calc(100vh - 100px);
+}
+main {
+  max-width: 800px;
+  margin: 0 auto;
 }
 article {
   font-size: 1.2em;
@@ -51,10 +62,18 @@ article.collapsed:after {
   pointer-events: none;
 }
 article.collapsed:hover:after {
+  transition: height 0.3s cubic-bezier(0.785, 0.135, 0.15, 0.86);
   height: 60px;
 }
 article.collapsed:hover > .articleLink h3 {
-  border-bottom-color: rgb(152, 158, 206);
+  /* border-bottom-color: rgb(152, 158, 206); */
+}
+article.collapsed > .articleLink h3:after {
+  transition: width 0.3s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+}
+article.collapsed:hover > .articleLink h3:after {
+  transition: width 0.3s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  width: 100%;
 }
 article img {
   max-width: 100%;
@@ -85,8 +104,18 @@ header a {
 h3 {
   font-size: 2em;
   padding: 0 0 5px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #fff;
   line-height: 1.2em;
+  position: relative;
+}
+h3:after {
+  content: "";
+  height: 1px;
+  background: rgb(152, 158, 206);
+  width: 0px;
+  position: absolute;
+  top: 100%;
+  left: 0px;
 }
 h4 {
   font-size: 1.5em;
@@ -158,6 +187,10 @@ footer a {
 footer a:hover {
   text-decoration: none;
 }
+.articleBodyLink {
+  color: #333;
+  text-decoration: none;
+}
 header,
 nav {
   text-align: center;
@@ -193,6 +226,9 @@ nav li button {
   padding: 20px 0px;
   outline: none;
   margin: 0 20px 0 0;
+}
+nav li button.gray {
+  color: rgba(0, 0, 0, 0.3);
 }
 code {
   font-size: 0.8em;
@@ -401,5 +437,93 @@ h1 {
 @media screen and (max-width: 330px) {
   body {
     font-size: 12px;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  body,
+  nav,
+  nav li button {
+    color: #cac8e4;
+  }
+  main {
+    background: #171727;
+    padding: 10px;
+  }
+  body,
+  nav {
+    background: linear-gradient(90deg, #171727 20px, transparent 1%) center,
+      linear-gradient(#171727 20px, transparent 1%) center, #1f1f38;
+    background-size: 22px 22px;
+  }
+  .comment-poster input[type="text"],
+  .comment-poster input[type="email"],
+  .comment-poster textarea {
+    background: #171727;
+    border-color: rgb(40, 40, 72);
+    color: #f9f9f9;
+  }
+  h1,
+  h3 {
+    color: #dbdaf0;
+  }
+  h3 {
+    border-color: transparent;
+  }
+  nav,
+  article.open {
+    border-color: rgb(36, 36, 61);
+  }
+  header p,
+  .articleBodyLink {
+    color: #b5b3cf;
+  }
+  article.collapsed:after {
+    background: linear-gradient(to top, rgb(23, 23, 39), rgba(23, 23, 39, 0.1));
+  }
+  code,
+  .wp-block-code code {
+    background: rgb(18, 18, 31);
+    color: #adaada;
+    color: #92cac2;
+  }
+  .wp-block-code code {
+    border-color: rgb(11, 11, 20);
+  }
+  article a {
+    color: rgb(154, 173, 236);
+  }
+  .social {
+    border-bottom-color: rgb(36, 36, 61);
+  }
+  .seperator {
+    color: rgb(36, 36, 61);
+  }
+  blockquote {
+    background: #171d2f;
+  }
+  .social > .SocialMediaShareButton {
+    background: rgb(18, 18, 31);
+  }
+  .comment-poster button {
+    border-color: rgb(18, 18, 31);
+  }
+  .articleLink:hover,
+  article.open .articleLink,
+  nav ul li button:hover {
+    color: rgb(154, 173, 236);
+  }
+  footer {
+    background: rgb(17, 17, 35);
+  }
+
+  nav li button.gray {
+    color: rgba(255, 255, 255, 0.3);
+  }
+  .comment {
+    background: #222;
+    border-color: #111;
+  }
+  .comment button {
+    color: #f9f9f9;
   }
 }

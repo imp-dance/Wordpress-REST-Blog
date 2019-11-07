@@ -16,12 +16,12 @@ class App extends React.Component {
     return (
       <React.Fragment>
         <div className="App">
-          <Header WPConfig={WPConfig}></Header>
-          <div className="minHeight">
-            <Router
-              basename={WPConfig.baseName}
-              onUpdate={() => window.scrollTo(0, 0)}
-            >
+          <Router
+            basename={WPConfig.baseName}
+            onUpdate={() => window.scrollTo(0, 0)}
+          >
+            <Header WPConfig={WPConfig}></Header>
+            <div className="minHeight">
               <ScrollToTop>
                 <Switch>
                   <ScrollToTopRoute path="/post/:postID" component={Post} />
@@ -29,8 +29,8 @@ class App extends React.Component {
                   <Route component={Index} />
                 </Switch>
               </ScrollToTop>
-            </Router>
-          </div>
+            </div>
+          </Router>
         </div>
         <footer>
           {

@@ -1,23 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOMServer from "react-dom/server";
 import CommentPoster from "./CommentPoster";
 import WPConfig from "../WordpressConfig";
 import "../App.css";
 const HtmlToReactParser = require("html-to-react").Parser;
 
-class Comment extends React.Component {
-  state = {
-    isReplying: false
+export const Comment = props => {
+  const [isReplying, setReplying] = useState(false);
+  const showReply = () => {
+    setReplying(!isReplying);
   };
-  showReply = () => {
-    this.setState({ isReplying: !this.state.isReplying });
-  };
-  reactParse = parse => {
+  const reactParse = parse => {
     let HTMLToReactParser = new HtmlToReactParser();
     let reactElement = HTMLToReactParser.parse(parse);
     return ReactDOMServer.renderToStaticMarkup(reactElement);
   };
-  parseDate = date => {
+  const parseDate = date => {
     let y = date.substring(0, 4);
     let m = date.substring(5, 7);
     let d = date.substring(8, 10);
@@ -25,80 +23,74 @@ class Comment extends React.Component {
     let min = date.substring(14, 16);
     return `${h}:${min} ${d}/${m}/${y}`;
   };
-  commentWasPosted = newCommentState => {
-    if (this.props.onUpdate !== undefined) {
-      this.props.onUpdate(newCommentState);
+  const commentWasPosted = newCommentState => {
+    if (props.onUpdate !== undefined) {
+      props.onUpdate(newCommentState);
     }
-    this.setState({ isReplying: false });
+    setReplying(false);
   };
-  render() {
-    let name = this.props.comment.author_name;
-    let body = this.reactParse(this.props.comment.content.rendered);
-    let date = this.parseDate(this.props.comment.date);
-    let img = this.props.comment.author_avatar_urls[48];
-    let nestedComments = this.props.nestedComments;
-    let nestedCommentsArray = [];
-    if (nestedComments.length >= 1) {
-      nestedComments.forEach((comment, index) => {
-        let allComments = this.props.allComments;
-        let replyID = comment.id;
-        let moreNestedComments = allComments.filter(
-          comment => comment.parent === replyID
-        );
-        nestedCommentsArray.push(
-          <Comment
-            key={index}
-            comment={comment}
-            index={index}
-            onUpdate={this.commentWasPosted}
-            nestedComments={moreNestedComments}
-            allComments={allComments}
-          />
-        );
-      });
-    }
-    let commentClassName =
-      this.props.comment.customStatus === "pending"
-        ? "comment pending"
-        : "comment";
-    return (
-      <div className={commentClassName} key={this.props.index}>
-        <div className="comment-header">
-          <img src={img} alt="Comment avatar" />
-          <strong className="comment-username">
-            {this.props.comment.author === 1 && <span>★</span>}
-            {name}
-          </strong>
-          <em>#{this.props.comment.id}</em>
-        </div>
-
-        <div
-          className="comment-body"
-          dangerouslySetInnerHTML={{ __html: body }}
+  let name = props.comment.author_name;
+  let body = reactParse(props.comment.content.rendered);
+  let date = parseDate(props.comment.date);
+  let img = props.comment.author_avatar_urls[48];
+  let nestedComments = props.nestedComments;
+  let nestedCommentsArray = [];
+  if (nestedComments.length >= 1) {
+    nestedComments.forEach((comment, index) => {
+      let allComments = props.allComments;
+      let replyID = comment.id;
+      let moreNestedComments = allComments.filter(
+        comment => comment.parent === replyID
+      );
+      nestedCommentsArray.push(
+        <Comment
+          key={index}
+          comment={comment}
+          index={index}
+          onUpdate={commentWasPosted}
+          nestedComments={moreNestedComments}
+          allComments={allComments}
         />
-        <i className="comment-date">
-          {this.props.comment.customStatus !== "pending" && (
-            <button onClick={this.showReply}>
-              {this.state.isReplying ? "Cancel" : "Reply"}
-            </button>
-          )}
-          {date}
-        </i>
-        {this.state.isReplying && (
-          <CommentPoster
-            replyTo={this.props.comment.id}
-            postID={this.props.comment.post}
-            onUpdate={this.commentWasPosted}
-            WPConfig={WPConfig}
-            comments={this.props.allComments}
-          />
-        )}
-        {nestedComments.length >= 1 && (
-          <div className="nestedComments">{nestedCommentsArray}</div>
-        )}
-      </div>
-    );
+      );
+    });
   }
-}
+  let commentClassName =
+    props.comment.customStatus === "pending" ? "comment pending" : "comment";
+  return (
+    <div className={commentClassName} key={props.index}>
+      <div className="comment-header">
+        <img src={img} alt="Comment avatar" />
+        <strong className="comment-username">
+          {props.comment.author === 1 && <span>★</span>}
+          {name}
+        </strong>
+        <em>#{props.comment.id}</em>
+      </div>
+
+      <div
+        className="comment-body"
+        dangerouslySetInnerHTML={{ __html: body }}
+      />
+      <i className="comment-date">
+        {props.comment.customStatus !== "pending" && (
+          <button onClick={showReply}>{isReplying ? "Cancel" : "Reply"}</button>
+        )}
+        {date}
+      </i>
+      {isReplying && (
+        <CommentPoster
+          replyTo={props.comment.id}
+          postID={props.comment.post}
+          onUpdate={commentWasPosted}
+          WPConfig={WPConfig}
+          comments={props.allComments}
+        />
+      )}
+      {nestedComments.length >= 1 && (
+        <div className="nestedComments">{nestedCommentsArray}</div>
+      )}
+    </div>
+  );
+};
 
 export default Comment;
