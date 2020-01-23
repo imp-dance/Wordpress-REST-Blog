@@ -6,6 +6,7 @@ import "../App.css";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import Loader from "./Loader";
 import {
   FacebookShareButton,
   RedditShareButton,
@@ -75,10 +76,15 @@ class Articles extends React.Component {
         )
         .then(res => res.data)
         .then(blogPosts => {
-          this.setState({
-            blogPosts: blogPosts,
-            loaded: true
-          });
+          this.setState(
+            {
+              blogPosts: blogPosts,
+              loaded: true
+            },
+            () => {
+              setTimeout(this.checkForForm, 1500);
+            }
+          );
         });
       axios
         .get(
@@ -93,6 +99,16 @@ class Articles extends React.Component {
       this.scrollToTop();
     }
   }
+  checkForForm = () => {
+    let form = document.querySelector(".wpforms-form");
+    if (form !== null) {
+      form.setAttribute(
+        "action",
+        "https://impedans.me/" + form.getAttribute("action")
+      );
+      console.log("Updated form");
+    }
+  };
   goToArticle = event => {
     window.location.href = `${
       this.props.WPConfig.baseName
@@ -127,6 +143,9 @@ class Articles extends React.Component {
   goToMusic = () => {
     window.location.href = "/blog/post/128";
   };
+  goToAbout = () => {
+    window.location.href = "/blog/post/136";
+  };
   goToCV = () => {
     window.open("https://haakon.underbakke.net/cv", "_blank");
   };
@@ -137,7 +156,7 @@ class Articles extends React.Component {
     event.preventDefault();
   };
   goHome = () => {
-    window.location.href = "/";
+    window.location.href = "/articles";
   };
   render() {
     let render = [];
@@ -165,23 +184,45 @@ class Articles extends React.Component {
     if (this.state.postID !== false) {
       categoryItems.push(
         <li key={"fart" + 1923}>
-          <button onClick={this.goHome}>&#8249; Articles & Projects</button>
+          <Link to="/articles">
+            <button>&#8249; Articles & Projects</button>
+          </Link>
         </li>
       );
-    }
+    } /* 
     categoryItems.push(
       <li key={"bart" + 1923} className="seperator">
         |
       </li>
-    );
+    ); */
     render.push(
       <nav key={"part" + 9991}>
         <ul>
           {categoryItems}
+          {/* 
           <li>
             <Link to="/post/128">
-              <button onClick={this.state.postID !== false && this.goToMusic}>
+              <button
+                onClick={
+                  this.state.postID !== false
+                    ? this.goToMusic
+                    : this.ignoreAction
+                }
+              >
                 Music
+              </button>
+            </Link>
+          </li>
+          <li>
+            <Link to="/post/136">
+              <button
+                onClick={
+                  this.state.postID !== false
+                    ? this.goToAbout
+                    : this.ignoreAction
+                }
+              >
+                About
               </button>
             </Link>
           </li>
@@ -190,7 +231,7 @@ class Articles extends React.Component {
           </li>
           <li>
             <button onClick={this.goToCV}>CV</button>
-          </li>
+          </li> */}
         </ul>
       </nav>
     );
@@ -220,7 +261,7 @@ class Articles extends React.Component {
           render.push(
             <article key={index} className={className} data-id={blogPost.id}>
               <Link
-                to={"/post/" + blogPost.id}
+                to={"/articles/post/" + blogPost.id}
                 data-id={blogPost.id}
                 className="articleLink"
               >
@@ -233,7 +274,7 @@ class Articles extends React.Component {
               </Link>
               {this.state.postID === false ? (
                 <Link
-                  to={"/post/" + blogPost.id}
+                  to={"/articles/post/" + blogPost.id}
                   data-id={blogPost.id}
                   className="articleBodyLink"
                 >
@@ -249,9 +290,7 @@ class Articles extends React.Component {
                 <div
                   className="body"
                   onClick={
-                    this.state.postID === false
-                      ? this.goToArticle
-                      : this.ignoreAction
+                    this.state.postID === false ? this.goToArticle : () => {}
                   }
                   data-id={blogPost.id}
                   dangerouslySetInnerHTML={{
@@ -267,18 +306,6 @@ class Articles extends React.Component {
     if (this.state.postID !== false) {
       // A specific post is open
       if (this.state.blogPosts[0].title.rendered !== "") {
-        // update meta-data
-        /* document.title =
-          this.reactParse(this.state.blogPosts[0].title.rendered) +
-          " - Håkon Underbakke";
-        let newMetaDescription = this.reactParse(
-          this.state.blogPosts[0].excerpt.rendered
-        );
-        newMetaDescription = newMetaDescription.substring(3);
-        newMetaDescription = newMetaDescription.slice(0, -5);
-        document
-          .querySelector('meta[name="description"]')
-          .setAttribute("content", newMetaDescription); */
         let metaDescription = this.reactParse(
           this.state.blogPosts[0].excerpt.rendered
         );
@@ -350,10 +377,24 @@ class Articles extends React.Component {
           </div>
         );
       }
+    } else {
+      render.push(
+        <Helmet key="123653">
+          <title>Håkon Underbakke - Articles</title>
+          <meta
+            name="description"
+            content={"Web development & design articles."}
+          />
+        </Helmet>
+      );
     }
     return (
       <React.Fragment>
-        {!this.state.loaded && <main className="showLoading">Loading...</main>}
+        {!this.state.loaded && (
+          <main className="showLoading">
+            <Loader />
+          </main>
+        )}
         <main className={this.state.loaded ? "loaded" : "loading"}>
           {render}
         </main>
