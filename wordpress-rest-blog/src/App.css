@@ -45,7 +45,7 @@ main {
 }
 .section-2 {
   background: #eee;
-  padding: 80px;
+  padding: 60px;
   width: 100%;
 }
 .section-2 main {
@@ -436,6 +436,14 @@ header.loaded p {
   padding: 6px 15px;
   font-size: 0.9em;
   color: #fff0f0;
+}
+#particles-js {
+  position: relative;
+  overflow: hidden;
+}
+.particles-js canvas {
+  position: absolute;
+  z-index: 0;
 }
 .social > .SocialMediaShareButton {
   display: inline-block;

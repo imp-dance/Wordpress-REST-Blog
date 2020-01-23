@@ -5,6 +5,7 @@ import Button from "./components/Button";
 import Header from "./components/Header";
 import Animation from "./components/Animation";
 import ScrollToTopRoute from "./components/ScrollToTopRoute";
+import Particles from "./components/Particles";
 import WPConfig from "./WordpressConfig";
 import { Helmet } from "react-helmet";
 import { Route, BrowserRouter as Router, Switch, Link } from "react-router-dom";
@@ -24,6 +25,7 @@ class App extends React.Component {
     window.scrollTo(0, 0);
     document.body.scrollTop = 0;
   };
+  componentDidMount() {}
   render() {
     return (
       <React.Fragment>
@@ -41,25 +43,28 @@ class App extends React.Component {
                 />
               </Helmet>
               <div className="App">
-                <Header WPConfig={WPConfig} hideTagline={true}></Header>
-                <main className="minHeight center animateIn">
-                  <p className="underLine">
-                    <strong>Web designer</strong>,{" "}
-                    <strong>legal tech developer</strong> and{" "}
-                    <strong>music producer</strong> currently working for{" "}
-                    <strong className="noFlip">
-                      <a
-                        href="https://ligl.no"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        LIGL AS
-                      </a>
-                    </strong>
-                    .
-                  </p>
-                  <Animation />
-                </main>
+                <div id="particles-js">
+                  <Particles />
+                  <Header WPConfig={WPConfig} hideTagline={true}></Header>
+                  <main className="minHeight center animateIn">
+                    <p className="underLine">
+                      <strong>Web designer</strong>,{" "}
+                      <strong>legal tech developer</strong> and{" "}
+                      <strong>music producer</strong> currently working for{" "}
+                      <strong className="noFlip">
+                        <a
+                          href="https://ligl.no"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          LIGL AS
+                        </a>
+                      </strong>
+                      .
+                    </p>
+                    <Animation />
+                  </main>
+                </div>
                 <div className="section-2">
                   <main>
                     <div className="indexLinks">

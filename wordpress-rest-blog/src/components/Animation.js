@@ -22,6 +22,7 @@ const LaptopScreen = styled.div`
   transition: transform 2s ease-out;
   animation: ${LaptopScreenAnimation} 2s ease-out;
   animation-fill-mode: forwards;
+  will-change: transform, opacity;
   transform-origin: bottom;
   display: flex;
   margin: 50px 0 0;
@@ -33,6 +34,8 @@ const LaptopScreen = styled.div`
   border-bottom-right-radius: 0px;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 50;
   @media (prefers-color-scheme: dark) {
     background: #1d1d29;
     border-color: #ccc;
@@ -80,6 +83,7 @@ const Laptop = styled.div`
   width: 100%;
   max-width: 500px;
   margin: 100px auto 70px;
+  will-change: transform, opacity;
   @media screen and (max-width: 800px) {
     padding: 0 20px;
   }
@@ -90,6 +94,7 @@ const LaptopKeyboard = styled.div`
   width: calc(100% + 80px);
   margin-left: -40px;
   border-radius: 10px;
+  will-change: transform, height;
   position: relative;
   @media screen and (max-width: 620px) {
     transition: height 0.2s ease-out;
@@ -155,6 +160,7 @@ const Icon = styled.div`
   font-size: 5em !important;
   font-weight: bold;
   font-family: monospace;
+  will-change: transform, opacity;
   user-select: none;
   color: #666;
   animation: ${IconAnimation} 2.5s ease-in-out infinite;
