@@ -61,7 +61,6 @@ class Articles extends React.Component {
             loaded: true
           });
           blogPosts.forEach(item => console.log(item.title.rendered));
-          console.log(blogPosts);
         });
       axios
         .get(`${this.props.WPConfig.siteURL}wp-json/wp/v2/categories`)
@@ -70,7 +69,6 @@ class Articles extends React.Component {
           this.setState({
             categories: categories
           });
-          console.log(categories);
         });
       this.scrollToTop();
     } else {
