@@ -1,7 +1,7 @@
 import React from "react";
 import WPConfig from "../WordpressConfig";
 import Articles from "../components/Articles";
-import "../App.css";
+import "../App.scss";
 
 function Index() {
   return (

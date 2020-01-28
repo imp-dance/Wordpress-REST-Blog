@@ -1,6 +1,7 @@
 import React from "react";
-import "../App.css";
+import "../App.scss";
 import axios from "axios";
+import { Link } from "react-router-dom";
 class Header extends React.Component {
   componentDidMount() {
     axios
@@ -17,14 +18,15 @@ class Header extends React.Component {
     siteTitle: "Loading...",
     siteDescription: "..."
   };
-  goToIndex = () => {
-    window.location.href = "/";
-  };
   render() {
     return (
-      <header>
-        <h1 onClick={this.goToIndex}>{this.state.siteTitle}</h1>
-        <p>{this.state.siteDescription}</p>
+      <header
+        className={this.state.siteTitle === "Loading..." ? "loading" : "loaded"}
+      >
+        <Link to="/">
+          <h1>{this.state.siteTitle}</h1>
+        </Link>
+        {!this.props.hideTagline && <p>{this.state.siteDescription}</p>}
       </header>
     );
   }
