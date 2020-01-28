@@ -307,12 +307,13 @@ nav li button.gray {
   font-weight: bold;
 }
 code {
-  font-size: 0.8em;
+  font-size: 0.7em;
   display: inline-block;
-  background: #f1ebe5;
-  color: #944d3c;
+  background: #282c34;
+  color: #d8d8de;
   padding: 0 5px;
   border-radius: 2px;
+  line-height: 1.7em;
 }
 article a {
   color: rgb(18, 44, 128);
@@ -510,7 +511,7 @@ header.loaded p {
   margin: 0 0 60px;
   padding: 0 0 60px;
   border-bottom: 1px solid #eee;
-}
+} /* 
 .wp-block-code code {
   width: 100%;
   padding: 10px;
@@ -519,6 +520,11 @@ header.loaded p {
   background: #f6fbff;
   border: 1px solid #d5dde4;
   line-height: 1.5em;
+} */
+.wp-block-code code {
+  border: 1px solid #d5dde4;
+  padding: 13px;
+  font-size: 0.6em;
 }
 .wpforms-form label {
   display: block;
@@ -750,15 +756,15 @@ body.darkModeBody {
       rgba(23, 23, 39, 0.1)
     ) !important;
   }
-  code,
+  /*   code,
   .wp-block-code code {
     background: rgb(18, 18, 31) !important;
     color: #adaada !important;
     color: #92cac2 !important;
-  }
-  .wp-block-code code {
+  } */
+  /*   .wp-block-code code {
     border-color: rgb(11, 11, 20) !important;
-  }
+  } */
   article a {
     color: rgb(154, 173, 236) !important;
   }

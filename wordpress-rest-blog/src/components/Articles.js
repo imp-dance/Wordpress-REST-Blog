@@ -7,6 +7,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Loader from "./Loader";
+import hljs from "highlight.js";
 import {
   FacebookShareButton,
   RedditShareButton,
@@ -83,6 +84,10 @@ class Articles extends React.Component {
             },
             () => {
               setTimeout(this.checkForForm, 1500);
+              ///
+              document.querySelectorAll("pre code").forEach(block => {
+                hljs.highlightBlock(block);
+              });
             }
           );
         });
@@ -189,50 +194,10 @@ class Articles extends React.Component {
           </Link>
         </li>
       );
-    } /* 
-    categoryItems.push(
-      <li key={"bart" + 1923} className="seperator">
-        |
-      </li>
-    ); */
+    }
     render.push(
       <nav key={"part" + 9991}>
-        <ul>
-          {categoryItems}
-          {/* 
-          <li>
-            <Link to="/post/128">
-              <button
-                onClick={
-                  this.state.postID !== false
-                    ? this.goToMusic
-                    : this.ignoreAction
-                }
-              >
-                Music
-              </button>
-            </Link>
-          </li>
-          <li>
-            <Link to="/post/136">
-              <button
-                onClick={
-                  this.state.postID !== false
-                    ? this.goToAbout
-                    : this.ignoreAction
-                }
-              >
-                About
-              </button>
-            </Link>
-          </li>
-          <li>
-            <button onClick={this.goToContact}>Contact</button>
-          </li>
-          <li>
-            <button onClick={this.goToCV}>CV</button>
-          </li> */}
-        </ul>
+        <ul>{categoryItems}</ul>
       </nav>
     );
     this.state.blogPosts.forEach((blogPost, index) => {
@@ -250,10 +215,6 @@ class Articles extends React.Component {
           body = body.substring(0, body.length - 9) + "...</p>";
         }
         let className = this.state.postID === false ? "collapsed" : "open";
-        /*if (index === 0 && this.state.sortArticles === null) {
-          className = "open"; // Latest article should be open on index
-          body = this.reactParse(blogPost.content.rendered);
-        }*/
         if (
           (this.state.postID === false && !blogPost.categories.includes(1)) ||
           this.state.postID !== false
