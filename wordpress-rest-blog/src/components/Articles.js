@@ -60,7 +60,6 @@ class Articles extends React.Component {
             blogPosts: blogPosts,
             loaded: true
           });
-          blogPosts.forEach(item => console.log(item.title.rendered));
         });
       axios
         .get(`${this.props.WPConfig.siteURL}wp-json/wp/v2/categories`)
