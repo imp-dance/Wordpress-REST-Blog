@@ -53,13 +53,15 @@ class Articles extends React.Component {
   componentDidMount() {
     if (this.state.postID === false) {
       axios
-        .get(`${this.props.WPConfig.siteURL}wp-json/wp/v2/posts`)
+        .get(`${this.props.WPConfig.siteURL}wp-json/wp/v2/posts/?per_page=100`)
         .then(res => res.data)
         .then(blogPosts => {
           this.setState({
             blogPosts: blogPosts,
             loaded: true
           });
+          blogPosts.forEach(item => console.log(item.title.rendered));
+          console.log(blogPosts);
         });
       axios
         .get(`${this.props.WPConfig.siteURL}wp-json/wp/v2/categories`)
@@ -68,6 +70,7 @@ class Articles extends React.Component {
           this.setState({
             categories: categories
           });
+          console.log(categories);
         });
       this.scrollToTop();
     } else {
@@ -133,7 +136,7 @@ class Articles extends React.Component {
     let reactElement = HTMLToReactParser.parse(parse);
     let string = ReactDOMServer.renderToStaticMarkup(reactElement);
     return string.replace("<code>", "<code class='markUpBaby'>");
-  };
+  }; /* 
   parseDate = date => {
     let y = date.substring(0, 4);
     let m = date.substring(5, 7);
@@ -141,7 +144,7 @@ class Articles extends React.Component {
     let h = date.substring(11, 13);
     let min = date.substring(14, 16);
     return `${h}:${min} ${d}/${m}/${y}`;
-  };
+  }; */
   updateComments = newCommentState => {
     this.setState({ newComments: newCommentState });
   };
@@ -165,39 +168,16 @@ class Articles extends React.Component {
   };
   render() {
     let render = [];
-    let categoryItems = [];
-    this.state.categories.forEach((category, index) => {
-      if (category.id !== 1) {
-        categoryItems.push(
-          <li key={"art" + 1888 + index} data-id={category.id}>
-            <button
-              onClick={this.sortArticles}
-              data-categoryid={category.id}
-              className={
-                this.state.sortArticles === null ||
-                parseInt(this.state.sortArticles) === parseInt(category.id)
-                  ? "white"
-                  : "gray"
-              }
-            >
-              {category.name}
-            </button>
-          </li>
-        );
-      }
-    });
-    if (this.state.postID !== false) {
-      categoryItems.push(
-        <li key={"fart" + 1923}>
-          <Link to="/articles">
-            <button>&#8249; All posts</button>
-          </Link>
-        </li>
-      );
-    }
     render.push(
       <nav key={"part" + 9991}>
-        <ul>{categoryItems}</ul>
+        <ul>
+          <Categories
+            isOnly={this.state.postID !== false}
+            categories={this.state.categories}
+            sortedArticles={this.state.sortArticles}
+            sortArticles={this.sortArticles}
+          />
+        </ul>
       </nav>
     );
     this.state.blogPosts.forEach((blogPost, index) => {
@@ -206,66 +186,23 @@ class Articles extends React.Component {
         blogPost.categories.includes(parseInt(this.state.sortArticles)) ||
         blogPost.categories === parseInt(this.state.sortArticles)
       ) {
-        let title = this.reactParse(blogPost.title.rendered);
-        let body =
-          this.state.postID === false
-            ? this.reactParse(blogPost.excerpt.rendered)
-            : this.reactParse(blogPost.content.rendered);
-        if (this.state.postID === false) {
-          body = body.substring(0, body.length - 9) + "...</p>";
-        }
-        let className = this.state.postID === false ? "collapsed" : "open";
         if (
           (this.state.postID === false && !blogPost.categories.includes(1)) ||
           this.state.postID !== false
         ) {
           render.push(
-            <article key={index} className={className} data-id={blogPost.id}>
-              <Link
-                to={"/articles/post/" + blogPost.id}
-                data-id={blogPost.id}
-                className="articleLink"
-              >
-                <h3
-                  data-id={blogPost.id}
-                  dangerouslySetInnerHTML={{
-                    __html: title
-                  }}
-                ></h3>
-              </Link>
-              {this.state.postID === false ? (
-                <Link
-                  to={"/articles/post/" + blogPost.id}
-                  data-id={blogPost.id}
-                  className="articleBodyLink"
-                >
-                  <div
-                    className="body"
-                    data-id={blogPost.id}
-                    dangerouslySetInnerHTML={{
-                      __html: body
-                    }}
-                  ></div>
-                </Link>
-              ) : (
-                <div
-                  className="body"
-                  onClick={
-                    this.state.postID === false ? this.goToArticle : () => {}
-                  }
-                  data-id={blogPost.id}
-                  dangerouslySetInnerHTML={{
-                    __html: body
-                  }}
-                ></div>
-              )}
-            </article>
+            <ArticleBody
+              isOnly={this.state.postID !== false}
+              blogPost={blogPost}
+              key={index}
+            />
           );
         }
       }
     });
     if (this.state.postID !== false) {
       // A specific post is open
+      // Let's add the meta-data for this specific post
       if (this.state.blogPosts[0].title.rendered !== "") {
         let metaDescription = this.reactParse(
           this.state.blogPosts[0].excerpt.rendered
@@ -280,9 +217,7 @@ class Articles extends React.Component {
           </Helmet>
         );
       }
-      let parentComments = this.state.comments.filter(
-        comment => comment.parent === 0
-      );
+      // Let's also show social sharing stuff
       let url = window.location.href;
       render.push(<h5 key={"aaart" + 9994}>Share on...</h5>);
       render.push(
@@ -295,6 +230,9 @@ class Articles extends React.Component {
         </div>
       );
       if (!this.state.blogPosts[0].categories.includes(1)) {
+        // Post is not hidden
+        // Let's now render the comments
+        //// Title
         if (this.state.comments.length === 1) {
           render.push(<h4 key={"bbbbart" + 9999}>1 Comment</h4>);
         } else if (this.state.comments.length === 0) {
@@ -306,6 +244,7 @@ class Articles extends React.Component {
             <h4 key={"bbart" + 9999}>{this.state.comments.length} Comments</h4>
           );
         }
+        //// Comment Poster
         render.push(
           <CommentPoster
             postID={this.state.postID}
@@ -316,11 +255,15 @@ class Articles extends React.Component {
           />
         );
         let comments = [];
+        let parentComments = this.state.comments.filter(
+          comment => comment.parent === 0
+        );
+        // Let's first loop through every first-level comment
         parentComments.forEach((comment, index) => {
           let parentID = comment.id;
           let nestedComments = this.state.comments.filter(
             comment => comment.parent === parentID
-          );
+          ); // Also render whatever nested comments are there
           comments.push(
             <Comment
               comment={comment}
@@ -332,6 +275,7 @@ class Articles extends React.Component {
             />
           );
         });
+        // Pushing comments into "render"
         render.push(
           <div className="comments-container" key={9998}>
             {comments}
@@ -339,6 +283,7 @@ class Articles extends React.Component {
         );
       }
     } else {
+      // Not a specific post, so we should make sure the meta-info is correct.
       render.push(
         <Helmet key="123653">
           <title>Håkon Underbakke - Articles</title>
@@ -365,3 +310,99 @@ class Articles extends React.Component {
 }
 
 export default Articles;
+
+const ArticleBody = ({ isOnly, key, blogPost }) => {
+  const className = isOnly ? "open" : "collapsed";
+  const goToArticle = event => {
+    window.location.href = `${
+      this.props.WPConfig.baseName
+    }post/${event.target.parentElement.getAttribute("data-id")}`;
+  };
+  const reactParse = parse => {
+    let HTMLToReactParser = new HtmlToReactParser();
+    let reactElement = HTMLToReactParser.parse(parse);
+    let string = ReactDOMServer.renderToStaticMarkup(reactElement);
+    return string.replace("<code>", "<code class='markUpBaby'>");
+  };
+  let title = reactParse(blogPost.title.rendered);
+  let body = isOnly
+    ? reactParse(blogPost.content.rendered)
+    : reactParse(blogPost.excerpt.rendered);
+  if (!isOnly) {
+    body = body.substring(0, body.length - 9) + "...</p>";
+  }
+  return (
+    <article key={key} className={className} data-id={blogPost.id}>
+      <Link
+        to={"/articles/post/" + blogPost.id}
+        data-id={blogPost.id}
+        className="articleLink"
+      >
+        <h3
+          data-id={blogPost.id}
+          dangerouslySetInnerHTML={{
+            __html: title
+          }}
+        ></h3>
+      </Link>
+      {isOnly ? (
+        <div
+          className="body"
+          onClick={!isOnly ? goToArticle : () => {}}
+          data-id={blogPost.id}
+          dangerouslySetInnerHTML={{
+            __html: body
+          }}
+        ></div>
+      ) : (
+        <Link
+          to={"/articles/post/" + blogPost.id}
+          data-id={blogPost.id}
+          className="articleBodyLink"
+        >
+          <div
+            className="body"
+            data-id={blogPost.id}
+            dangerouslySetInnerHTML={{
+              __html: body
+            }}
+          ></div>
+        </Link>
+      )}
+    </article>
+  );
+};
+
+const Categories = ({ categories, sortedArticles, isOnly, sortArticles }) => {
+  let categoryItems = [];
+  categories.forEach((category, index) => {
+    if (category.id !== 1) {
+      categoryItems.push(
+        <li key={"art" + 1888 + index} data-id={category.id}>
+          <button
+            onClick={sortArticles}
+            data-categoryid={category.id}
+            className={
+              sortedArticles === null ||
+              parseInt(sortedArticles) === parseInt(category.id)
+                ? "white"
+                : "gray"
+            }
+          >
+            {category.name}
+          </button>
+        </li>
+      );
+    }
+  });
+  if (isOnly) {
+    categoryItems.push(
+      <li key={"fart" + 1923}>
+        <Link to="/articles">
+          <button>&#8249; All posts</button>
+        </Link>
+      </li>
+    );
+  }
+  return categoryItems;
+};

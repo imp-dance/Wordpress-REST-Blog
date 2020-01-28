@@ -19,7 +19,10 @@ const AnimationContainer = props => {
     }
   };
   useEffect(() => {
-    setTimeout(changeLoopText.bind(null, loopIteration + 1), 500);
+    let timer = setTimeout(changeLoopText.bind(null, loopIteration + 1), 500);
+    return () => {
+      clearTimeout(timer);
+    };
     // eslint-disable-next-line
   }, []);
   const iconKey = loopIteration + Math.random() * 20;
