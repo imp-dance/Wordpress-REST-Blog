@@ -6,10 +6,17 @@ import Header from "./components/Header";
 import Animation from "./components/Animation";
 import ScrollToTopRoute from "./components/ScrollToTopRoute";
 import Particles from "./components/Particles";
+import OnOffDarkmode from "./components/OnOffDarkMode";
 import WPConfig from "./WordpressConfig";
 import { Helmet } from "react-helmet";
-import { Route, BrowserRouter as Router, Switch, Link } from "react-router-dom";
-import "./App.css";
+import {
+  Route,
+  BrowserRouter as Router,
+  Switch,
+  Link,
+  Redirect
+} from "react-router-dom";
+import "./App.scss";
 
 class App extends React.Component {
   state = {
@@ -19,16 +26,31 @@ class App extends React.Component {
       article: false,
       articles: false,
       articleID: null
-    }
+    },
+    dm: false
   };
   scrollToTop = () => {
     window.scrollTo(0, 0);
     document.body.scrollTop = 0;
   };
-  componentDidMount() {}
+  componentDidMount() {
+    if (localStorage.getItem("imp-site-dm") === "true") {
+      this.setState({ dm: true });
+    }
+  }
+  changedDM = dm => {
+    this.setState({ dm });
+  };
+  clickedAnimation = () => {
+    this.setState({ redirect: "about" });
+    setTimeout(() => {
+      this.setState({ redirect: null });
+    }, 100);
+  };
   render() {
     return (
       <React.Fragment>
+        <OnOffDarkmode onChange={this.changedDM} />
         <Router
           basename={WPConfig.baseName}
           onUpdate={() => window.scrollTo(0, 0)}
@@ -42,11 +64,17 @@ class App extends React.Component {
                   content={"Web development & design articles."}
                 />
               </Helmet>
+              {this.state.redirect === "about" && (
+                <Redirect to="/articles/post/136" />
+              )}
               <div className="App">
                 <div id="particles-js">
                   <Particles />
                   <Header WPConfig={WPConfig} hideTagline={true}></Header>
-                  <main className="minHeight center animateIn">
+                  <main
+                    className="minHeight center animateIn"
+                    style={{ padding: "10px" }}
+                  >
                     <p className="underLine">
                       <strong>Web designer</strong>,{" "}
                       <strong>legal tech developer</strong> and{" "}
@@ -62,7 +90,10 @@ class App extends React.Component {
                       </strong>
                       .
                     </p>
-                    <Animation />
+                    <Animation
+                      dm={this.state.dm}
+                      onClick={this.clickedAnimation}
+                    />
                   </main>
                 </div>
                 <div className="section-2">

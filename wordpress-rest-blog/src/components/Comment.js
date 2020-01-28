@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ReactDOMServer from "react-dom/server";
 import CommentPoster from "./CommentPoster";
 import WPConfig from "../WordpressConfig";
-import "../App.css";
+import "../App.scss";
 const HtmlToReactParser = require("html-to-react").Parser;
 
 export const Comment = props => {

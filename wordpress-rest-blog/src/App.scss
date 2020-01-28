@@ -41,7 +41,7 @@ button {
 main {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px;
 }
 .section-2 {
   background: #eee;
@@ -102,10 +102,19 @@ header {
   /* 
   margin: 0 0 60px; */
   padding: 50px 0 60px;
+  h1,
+  a {
+    display: inline-block;
+  }
+  a {
+    position: relative;
+    z-index: 2;
+  }
 }
 header a {
   color: #2a3b56;
   text-decoration: none;
+  user-select: none;
 }
 .loading {
   opacity: 0;
@@ -282,6 +291,21 @@ nav li button.gray {
 .center {
   text-align: center;
 }
+.onOffDM {
+  position: fixed;
+  top: 16px;
+  right: 12px;
+  background: #10101f;
+  padding: 8px 10px;
+  font-size: 0.7em;
+  color: #cac8e4;
+  cursor: pointer;
+  z-index: 9999;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  font-weight: bold;
+}
 code {
   font-size: 0.8em;
   display: inline-block;
@@ -444,6 +468,18 @@ header.loaded p {
 .particles-js canvas {
   position: absolute;
   z-index: 0;
+  will-change: transform, opacity;
+  animation: particlesAnimation 2.5s ease-in-out;
+}
+.imp-laptop .particles-js {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.imp-laptop .particles-js canvas {
+  left: 0;
 }
 .social > .SocialMediaShareButton {
   display: inline-block;
@@ -523,6 +559,8 @@ header.loaded p {
 }
 .underLine {
   line-height: 1.7em;
+  user-select: none;
+  pointer-events: none;
 }
 .underLine a {
   color: #222;
@@ -566,6 +604,11 @@ h1 {
 @keyframes h1Animation {
   from {
     transform: translate(0px, 10px);
+    opacity: 0;
+  }
+}
+@keyframes particlesAnimation {
+  from {
     opacity: 0;
   }
 }
@@ -639,108 +682,119 @@ h1 {
     font-size: 1.4em;
   }
 }
-@media (prefers-color-scheme: dark) {
+body.darkModeBody {
+  background: linear-gradient(90deg, #171727 20px, transparent 1%) center,
+    linear-gradient(#171727 20px, transparent 1%) center, #1f1f38 !important;
+  background-size: 22px 22px !important;
+  background-attachment: fixed !important;
+  color: #cac8e4 !important;
   body,
   nav,
   nav li button {
-    color: #cac8e4;
+    color: #cac8e4 !important;
   }
   .section-2 {
-    background: #1e1e31;
+    background: #1e1e31 !important;
+    > main {
+      background: transparent !important;
+    }
   }
   .underLine a {
-    color: #cac8e4;
+    color: #cac8e4 !important;
   }
   .indexLinks button {
-    --bg: rgb(70, 70, 101);
-    background: var(--bg);
-    border-color: var(--bg);
-    line-height: 1.5em;
+    --bg: rgb(70, 70, 101) !important;
+    background: var(--bg) !important;
+    border-color: var(--bg) !important;
+    line-height: 1.5em !important;
   }
   .indexLinks button:hover {
-    background: transparent;
+    background: transparent !important;
   }
   main {
-    background: #171727;
-    padding: 10px;
+    background: #171727 !important;
+    padding: 10px !important;
   }
-  body,
   nav {
     background: linear-gradient(90deg, #171727 20px, transparent 1%) center,
-      linear-gradient(#171727 20px, transparent 1%) center, #1f1f38;
-    background-size: 22px 22px;
-    background-attachment: fixed;
+      linear-gradient(#171727 20px, transparent 1%) center, #1f1f38 !important;
+    background-size: 22px 22px !important;
+    background-attachment: fixed !important;
   }
   .comment-poster input[type="text"],
   .comment-poster input[type="email"],
   .comment-poster textarea {
-    background: #171727;
-    border-color: rgb(40, 40, 72);
-    color: #f9f9f9;
+    background: #171727 !important;
+    border-color: rgb(40, 40, 72) !important;
+    color: #f9f9f9 !important;
   }
   h1,
   h3 {
-    color: #dbdaf0;
+    color: #dbdaf0 !important;
   }
   h3 {
-    border-color: transparent;
+    border-color: transparent !important;
   }
   nav,
   article.open {
-    border-color: rgb(36, 36, 61);
+    border-color: rgb(36, 36, 61) !important;
   }
   header p,
   .articleBodyLink {
-    color: #b5b3cf;
+    color: #b5b3cf !important;
   }
   article.collapsed:after {
-    background: linear-gradient(to top, rgb(23, 23, 39), rgba(23, 23, 39, 0.1));
+    background: linear-gradient(
+      to top,
+      rgb(23, 23, 39),
+      rgba(23, 23, 39, 0.1)
+    ) !important;
   }
   code,
   .wp-block-code code {
-    background: rgb(18, 18, 31);
-    color: #adaada;
-    color: #92cac2;
+    background: rgb(18, 18, 31) !important;
+    color: #adaada !important;
+    color: #92cac2 !important;
   }
   .wp-block-code code {
-    border-color: rgb(11, 11, 20);
+    border-color: rgb(11, 11, 20) !important;
   }
   article a {
-    color: rgb(154, 173, 236);
+    color: rgb(154, 173, 236) !important;
   }
   .social {
-    border-bottom-color: rgb(36, 36, 61);
+    border-bottom-color: rgb(36, 36, 61) !important;
   }
   .seperator {
-    color: rgb(36, 36, 61);
+    color: rgb(36, 36, 61) !important;
   }
   blockquote {
-    background: #171d2f;
+    background: #171d2f !important;
   }
   .social > .SocialMediaShareButton {
-    background: rgb(18, 18, 31);
+    background: rgb(18, 18, 31) !important;
   }
   .comment-poster button {
-    border-color: rgb(18, 18, 31);
+    border-color: rgb(18, 18, 31) !important;
   }
   .articleLink:hover,
   article.open .articleLink,
   nav ul li button:hover {
-    color: rgb(154, 173, 236);
+    color: rgb(154, 173, 236) !important;
   }
   footer {
-    background: rgb(17, 17, 35);
+    background: rgb(17, 17, 35) !important;
   }
 
   nav li button.gray {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.3) !important;
   }
   .comment {
-    background: #222;
-    border-color: #111;
+    background: #222 !important;
+    border-color: #111 !important;
   }
   .comment button {
-    color: #f9f9f9;
+    color: #f9f9f9 !important;
   }
 }
 @keyframes animateIn {

@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOMServer from "react-dom/server";
 import Comment from "./Comment";
 import CommentPoster from "./CommentPoster";
-import "../App.css";
+import "../App.scss";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -185,7 +185,7 @@ class Articles extends React.Component {
       categoryItems.push(
         <li key={"fart" + 1923}>
           <Link to="/articles">
-            <button>&#8249; Articles & Projects</button>
+            <button>&#8249; All posts</button>
           </Link>
         </li>
       );
