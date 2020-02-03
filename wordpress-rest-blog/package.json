@@ -16,6 +16,7 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.1",
     "react-share": "^3.0.1",
+    "react-vertical-timeline-component": "^2.5.0",
     "styled-components": "^4.4.1"
   },
   "scripts": {
