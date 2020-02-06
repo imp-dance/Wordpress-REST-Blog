@@ -1,5 +1,5 @@
 body {
-  font-size: 19px;
+  font-size: 18px;
   background: #f7fafd;
   background-size: 22px 22px;
 }
@@ -14,9 +14,9 @@ body,
 input,
 button,
 textarea {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
 }
 button {
   cursor: pointer;
@@ -38,6 +38,13 @@ button {
   overflow-x: auto;
   max-height: calc(100vh - 100px);
 }
+h1,
+h2,
+h3,
+h4,
+code {
+  font-family: "IBM Plex Mono", monospace !important;
+}
 main {
   max-width: 800px;
   margin: 0 auto;
@@ -51,9 +58,18 @@ main {
 .section-2 main {
   background: transparent;
 }
+.hljs {
+  background: #272733 !important;
+}
 article {
   font-size: 1.2em;
   line-height: 1.5em;
+}
+article h4:before {
+  content: "#";
+  position: relative;
+  left: -20px;
+  opacity: 0.5;
 }
 article.open {
   padding-bottom: 60px;
@@ -94,7 +110,7 @@ article img {
   max-width: 100%;
 }
 h1 {
-  font-size: 3.5em;
+  font-size: 2.9em;
   margin: 20px 0 0;
   cursor: pointer;
 }
@@ -360,7 +376,7 @@ article[data-id="136"] {
   grid-template-columns: auto 1fr auto;
   align-content: center;
   align-items: center;
-  background: #313844;
+  background: #111123;
   color: #f9f9f9;
   border-top-left-radius: 90px;
   border-bottom-left-radius: 90px;
@@ -590,9 +606,24 @@ header.loaded p {
   }
 }
 .wp-block-code code {
-  border: 1px solid #d5dde4;
-  padding: 13px;
+  border: 1px solid #3c3c52;
+  padding: 17px 40px;
   font-size: 0.6em;
+  counter-reset: line;
+  .code-line {
+    display: inline-block;
+    line-height: 0.2em;
+    position: relative;
+    &:before {
+      counter-increment: line;
+      content: counter(line);
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      left: -30px;
+      opacity: 0.5;
+    }
+  }
 }
 .wpforms-form label {
   display: block;
@@ -867,8 +898,8 @@ body.darkModeBody {
     color: rgba(255, 255, 255, 0.3) !important;
   }
   .comment {
-    background: #222 !important;
-    border-color: #111 !important;
+    background: #1d1d2f !important;
+    border-color: #111123 !important;
   }
   .comment button {
     color: #f9f9f9 !important;
