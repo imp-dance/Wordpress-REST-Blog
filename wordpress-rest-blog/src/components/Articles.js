@@ -89,8 +89,15 @@ class Articles extends React.Component {
             },
             () => {
               this.checkForForm();
-              document.querySelectorAll("pre code").forEach(block => {
+              const codes = document.querySelectorAll("pre code");
+              codes.forEach(block => {
                 hljs.highlightBlock(block);
+                const lines = block.innerHTML.split("\n");
+                const newLines = [];
+                lines.forEach(line => {
+                  newLines.push(`<div class="code-line">${line}</div>`);
+                });
+                block.innerHTML = newLines.join("\n");
               });
             }
           );
@@ -450,7 +457,7 @@ const Categories = ({ categories, sortedArticles, isOnly, sortArticles }) => {
     categoryItems.push(
       <li key={"fart" + 1923}>
         <Link to="/articles">
-          <button>&#8249; All posts</button>
+          <button>&#8249; Blog</button>
         </Link>
       </li>
     );
