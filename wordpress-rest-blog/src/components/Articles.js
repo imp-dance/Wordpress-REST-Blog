@@ -457,7 +457,7 @@ const Categories = ({ categories, sortedArticles, isOnly, sortArticles }) => {
     categoryItems.push(
       <li key={"fart" + 1923}>
         <Link to="/articles">
-          <button>&#8249; Blog</button>
+          <button>&#8249; Articles</button>
         </Link>
       </li>
     );

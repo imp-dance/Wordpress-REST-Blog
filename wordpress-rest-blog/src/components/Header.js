@@ -1,35 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../App.scss";
 import axios from "axios";
 import { Link } from "react-router-dom";
-class Header extends React.Component {
-  componentDidMount() {
+const Header = ({ path, WPConfig, hideTagline }) => {
+  const [siteTitle, setSiteTitle] = useState("Loading...");
+  const [siteDescription, setSiteDescription] = useState("...");
+  const [isSmall, setSmall] = useState(false);
+  useEffect(() => {
     axios
-      .get(`${this.props.WPConfig.siteURL}wp-json/`)
+      .get(`${WPConfig.siteURL}wp-json/`)
       .then(res => res.data)
       .then(siteInfo => {
-        this.setState({
-          siteTitle: siteInfo.name,
-          siteDescription: siteInfo.description
-        });
+        setSiteTitle(siteInfo.name);
+        setSiteDescription(siteInfo.description);
       });
-  }
-  state = {
-    siteTitle: "Loading...",
-    siteDescription: "..."
-  };
-  render() {
-    return (
-      <header
-        className={this.state.siteTitle === "Loading..." ? "loading" : "loaded"}
-      >
-        <Link to="/">
-          <h1>{this.state.siteTitle}</h1>
-        </Link>
-        {!this.props.hideTagline && <p>{this.state.siteDescription}</p>}
-      </header>
-    );
-  }
-}
+  }, []);
+  useEffect(() => {
+    if (path !== undefined && path.startsWith("/articles/post")) setSmall(true);
+    else setSmall(false);
+  }, [path]);
+  let addon = isSmall ? " articleIsOpen" : "";
+  return (
+    <header
+      className={siteTitle === "Loading..." ? "loading" : "loaded" + addon}
+    >
+      <Link to="/" className={isSmall ? "smallHeading" : ""}>
+        <h1>{isSmall ? "HU" : siteTitle}</h1>
+      </Link>
+      {!hideTagline && !isSmall && <p>{siteDescription}</p>}
+    </header>
+  );
+};
 
 export default Header;

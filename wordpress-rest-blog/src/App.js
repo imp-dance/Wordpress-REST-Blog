@@ -14,10 +14,10 @@ import {
   BrowserRouter as Router,
   Switch,
   Link,
-  Redirect
+  Redirect,
+  withRouter
 } from "react-router-dom";
 import "./App.scss";
-
 class App extends React.Component {
   state = {
     to: {
@@ -27,7 +27,12 @@ class App extends React.Component {
       articles: false,
       articleID: null
     },
-    dm: false
+    dm: false,
+    contextProvider: {
+      isCurrentlyPost: window.location.href.startsWith(
+        "https://haakon.underbakke.net/blog/articles/post/"
+      )
+    }
   };
   scrollToTop = () => {
     window.scrollTo(0, 0);
@@ -51,101 +56,103 @@ class App extends React.Component {
     return (
       <React.Fragment>
         <OnOffDarkmode onChange={this.changedDM} />
-        <Router
-          basename={WPConfig.baseName}
-          onUpdate={() => window.scrollTo(0, 0)}
-        >
-          <Switch>
-            <Route path="/" exact={true}>
-              <Helmet>
-                <title>Håkon Underbakke</title>
-                <meta
-                  name="description"
-                  content={"Web development & design articles."}
-                />
-              </Helmet>
-              {this.state.redirect === "about" && (
-                <Redirect to="/articles/post/136" />
-              )}
-              <div className="App">
-                <div id="particles-js">
-                  <Particles />
-                  <Header WPConfig={WPConfig} hideTagline={true}></Header>
-                  <main
-                    className="minHeight center animateIn"
-                    style={{ padding: "10px" }}
-                  >
-                    <p className="underLine">
-                      <strong>Web designer</strong>,{" "}
-                      <strong>legal tech developer</strong> and{" "}
-                      <strong>music producer</strong> currently working for{" "}
-                      <strong className="noFlip">
-                        <a
-                          href="https://ligl.no"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          LIGL AS
-                        </a>
-                      </strong>
-                      .
-                    </p>
-                    <Animation
-                      dm={this.state.dm}
-                      onClick={this.clickedAnimation}
-                    />
-                  </main>
-                </div>
-                <div className="section-2">
-                  <main>
-                    <div className="indexLinks">
-                      <div>
-                        <Link to="/articles">
-                          <Button>Articles</Button>
-                        </Link>
-                      </div>
-                      <div>
-                        <Link to="/articles/post/136">
-                          <Button>More info</Button>
-                        </Link>
-                      </div>
-                      <div>
-                        <a href="https://impedans.me/web/contact-me/">
-                          <Button>Contact me</Button>
-                        </a>
-                      </div>
+        <Switch>
+          <Route path="/" exact={true}>
+            <Helmet>
+              <title>Håkon Underbakke</title>
+              <meta
+                name="description"
+                content={"Web development & design articles."}
+              />
+            </Helmet>
+            {this.state.redirect === "about" && (
+              <Redirect to="/articles/post/136" />
+            )}
+            <div className="App">
+              <div id="particles-js">
+                <Particles />
+                <Header
+                  path={this.props.location.pathname}
+                  WPConfig={WPConfig}
+                  hideTagline={true}
+                ></Header>
+                <main
+                  className="minHeight center animateIn"
+                  style={{ padding: "10px" }}
+                >
+                  <p className="underLine">
+                    <strong>Web designer</strong>,{" "}
+                    <strong>legal tech developer</strong> and{" "}
+                    <strong>music producer</strong> currently working for{" "}
+                    <strong className="noFlip">
+                      <a
+                        href="https://ligl.no"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        LIGL AS
+                      </a>
+                    </strong>
+                    .
+                  </p>
+                  <Animation
+                    dm={this.state.dm}
+                    onClick={this.clickedAnimation}
+                  />
+                </main>
+              </div>
+              <div className="section-2">
+                <main>
+                  <div className="indexLinks">
+                    <div>
+                      <Link to="/articles">
+                        <Button>Articles</Button>
+                      </Link>
                     </div>
-                  </main>
-                </div>
+                    <div>
+                      <Link to="/articles/post/136">
+                        <Button>More info</Button>
+                      </Link>
+                    </div>
+                    <div>
+                      <a href="https://impedans.me/web/contact-me/">
+                        <Button>Contact me</Button>
+                      </a>
+                    </div>
+                  </div>
+                </main>
               </div>
-            </Route>
-            <Route path="/articles">
-              <div className="App">
-                <Header WPConfig={WPConfig}></Header>
-                <div className="minHeight">
-                  <ScrollToTop>
-                    <Switch>
-                      <ScrollToTopRoute
-                        path="/articles/post/:postID"
-                        component={Post}
-                      />
-                      <Route path="/" exact={true}>
-                        <Index></Index>
-                      </Route>
-                      <Route component={Index} />
-                    </Switch>
-                  </ScrollToTop>
-                </div>
+            </div>
+          </Route>
+          <Route path="/articles">
+            <div className="App">
+              <Header
+                WPConfig={WPConfig}
+                path={this.props.location.pathname}
+              ></Header>
+              <div className="minHeight">
+                <ScrollToTop>
+                  <Switch>
+                    <ScrollToTopRoute
+                      path="/articles/post/:postID"
+                      component={Post}
+                    />
+                    <Route path="/" exact={true}>
+                      <Index></Index>
+                    </Route>
+                    <Route component={Index} />
+                  </Switch>
+                </ScrollToTop>
               </div>
-              <footer>
-                {
-                  //eslint-disable-next-line
-                  <a href="#">Back to top</a>
-                }
-              </footer>
-            </Route>
-          </Switch>
-        </Router>
+            </div>
+            <footer>
+              {
+                //eslint-disable-next-line
+                <a href="#">Back to top</a>
+              }
+            </footer>
+          </Route>
+        </Switch>
       </React.Fragment>
     );
   }
@@ -162,4 +169,4 @@ class ScrollToTop extends React.Component {
   }
 }
 
-export default App;
+export default withRouter(App);
