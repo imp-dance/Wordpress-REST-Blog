@@ -49,6 +49,9 @@ main {
   max-width: 800px;
   margin: 0 auto;
   padding: 10px;
+  &.lessPadding {
+    padding-top: 0px;
+  }
 }
 .section-2 {
   background: #eee;
@@ -65,19 +68,24 @@ article {
   font-size: 1.2em;
   line-height: 1.5em;
 }
+.footerDate {
+  text-align: right;
+  font-size: 0.8em;
+  opacity: 0.7;
+  font-weight: bold;
+}
 .smallHeading {
   position: fixed;
-  display: block;
+  display: inline-block;
   left: 20px;
-  top: 20px;
+  top: 0px;
   background: #000;
   color: #dbdaf0 !important;
   padding: 20px;
   animation: dropDown 0.7s cubic-bezier(0.785, 0.135, 0.15, 0.86);
 }
 .smallHeading h1 {
-  position: relative;
-  z-index: 9950;
+  display: inline-block;
 }
 article h4:before {
   content: "#";
@@ -141,7 +149,7 @@ header {
     z-index: 2;
   }
   &.articleIsOpen {
-    padding: 0 0 20px !important;
+    padding: 0 !important;
   }
 }
 header a {
