@@ -7,14 +7,16 @@ const Header = ({ path, WPConfig, hideTagline }) => {
   const [siteDescription, setSiteDescription] = useState("...");
   const [isSmall, setSmall] = useState(false);
   useEffect(() => {
-    axios
-      .get(`${WPConfig.siteURL}wp-json/`)
-      .then(res => res.data)
-      .then(siteInfo => {
-        setSiteTitle(siteInfo.name);
-        setSiteDescription(siteInfo.description);
-      });
-  }, []);
+    if (!isSmall) {
+      axios
+        .get(`${WPConfig.siteURL}wp-json/`)
+        .then(res => res.data)
+        .then(siteInfo => {
+          setSiteTitle(siteInfo.name);
+          setSiteDescription(siteInfo.description);
+        });
+    }
+  }, [isSmall, WPConfig.siteURL]);
   useEffect(() => {
     if (path !== undefined && path.startsWith("/articles/post")) setSmall(true);
     else setSmall(false);

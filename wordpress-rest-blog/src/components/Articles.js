@@ -89,8 +89,8 @@ class Articles extends React.Component {
             },
             () => {
               this.checkForForm();
-              const codes = document.querySelectorAll("pre code");
-              codes.forEach(block => {
+              const blockCodes = document.querySelectorAll("pre code");
+              blockCodes.forEach(block => {
                 hljs.highlightBlock(block);
                 const lines = block.innerHTML.split("\n");
                 const newLines = [];
@@ -144,15 +144,15 @@ class Articles extends React.Component {
     let reactElement = HTMLToReactParser.parse(parse);
     let string = ReactDOMServer.renderToStaticMarkup(reactElement);
     return string.replace("<code>", "<code class='markUpBaby'>");
-  }; /* 
-  parseDate = date => {
+  };
+  parseDate = (date, showHour = false) => {
     let y = date.substring(0, 4);
     let m = date.substring(5, 7);
     let d = date.substring(8, 10);
     let h = date.substring(11, 13);
     let min = date.substring(14, 16);
-    return `${h}:${min} ${d}/${m}/${y}`;
-  }; */
+    return showHour ? `${h}:${min} ${d}/${m}/${y}` : `${d}/${m}/${y}`;
+  };
   updateComments = newCommentState => {
     this.setState({ newComments: newCommentState });
   };
@@ -273,9 +273,22 @@ class Articles extends React.Component {
           );
         }
       }
+
       // Let's also show social sharing stuff
       let url = window.location.href;
       if (this.state.postID !== "136") {
+        if (this.state.postID !== null) {
+          render.push(
+            <div className="footerDate">
+              P{" "}
+              {this.state.blogPosts[0].date !== undefined &&
+                this.parseDate(this.state.blogPosts[0].date)}
+              <br />U{" "}
+              {this.state.blogPosts[0].modified !== undefined &&
+                this.parseDate(this.state.blogPosts[0].modified)}
+            </div>
+          );
+        }
         render.push(<h5 key={"aaart" + 9994}>Share on...</h5>);
         render.push(
           <div className="social" key={"arts" + 9993}>

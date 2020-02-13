@@ -9,14 +9,7 @@ import Particles from "./components/Particles";
 import OnOffDarkmode from "./components/OnOffDarkMode";
 import WPConfig from "./WordpressConfig";
 import { Helmet } from "react-helmet";
-import {
-  Route,
-  BrowserRouter as Router,
-  Switch,
-  Link,
-  Redirect,
-  withRouter
-} from "react-router-dom";
+import { Route, Switch, Link, Redirect, withRouter } from "react-router-dom";
 import "./App.scss";
 class App extends React.Component {
   state = {
@@ -79,6 +72,9 @@ class App extends React.Component {
                 <main
                   className="minHeight center animateIn"
                   style={{ padding: "10px" }}
+                  lessPadding={this.props.location.pathname.startsWith(
+                    "/articles/post"
+                  )}
                 >
                   <p className="underLine">
                     <strong>Web designer</strong>,{" "}
