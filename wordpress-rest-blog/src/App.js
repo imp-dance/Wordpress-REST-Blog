@@ -1,9 +1,9 @@
 import React from "react";
 import Index from "./pages/Index";
 import Post from "./pages/Post";
-import Button from "./components/Button";
+import Button from "./components/Button/Button";
 import Header from "./components/Header";
-import Animation from "./components/Animation";
+import Animation from "./components/Animation/Animation";
 import ScrollToTopRoute from "./components/ScrollToTopRoute";
 import Particles from "./components/Particles";
 import OnOffDarkmode from "./components/OnOffDarkMode";
@@ -72,9 +72,6 @@ class App extends React.Component {
                 <main
                   className="minHeight center animateIn"
                   style={{ padding: "10px" }}
-                  lessPadding={this.props.location.pathname.startsWith(
-                    "/articles/post"
-                  )}
                 >
                   <p className="underLine">
                     <strong>Web designer</strong>,{" "}

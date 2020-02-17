@@ -1,6 +1,6 @@
 import React from "react";
 import WPConfig from "../WordpressConfig";
-import Articles from "../components/Articles";
+import Articles from "../components/Articles/Articles";
 import "../App.scss";
 
 class Post extends React.Component {

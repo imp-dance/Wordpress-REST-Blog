@@ -356,6 +356,7 @@ code {
   border-radius: 2px;
   line-height: 1.7em;
   margin-right: 5px;
+  cursor: pointer;
 }
 article a {
   color: rgb(18, 44, 128);
@@ -640,6 +641,7 @@ header.loaded p {
   border: 1px solid #3c3c52;
   padding: 17px 50px;
   font-size: 0.6em;
+  cursor: auto;
   counter-reset: line;
   .code-line {
     display: inline-block;
