@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOMServer from "react-dom/server";
-import Comment from "./Comment";
-import CommentPoster from "./CommentPoster";
-import "../App.scss";
+import Comment from "../Comment";
+import CommentPoster from "../CommentPoster";
+import "../../App.scss";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import Loader from "./Loader";
+import Loader from "../Loader";
 import hljs from "highlight.js";
 import {
   VerticalTimeline,
@@ -21,6 +21,21 @@ import {
   EmailShareButton
 } from "react-share";
 const HtmlToReactParser = require("html-to-react").Parser;
+function selectText(node) {
+  if (document.body.createTextRange) {
+    const range = document.body.createTextRange();
+    range.moveToElementText(node);
+    range.select();
+  } else if (window.getSelection) {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  } else {
+    console.warn("Could not select text in node: Unsupported browser.");
+  }
+}
 
 class Articles extends React.Component {
   state = {
@@ -98,6 +113,10 @@ class Articles extends React.Component {
                   newLines.push(`<div class="code-line"> ${line}</div>`);
                 });
                 block.innerHTML = newLines.join("\n");
+              });
+              const inlineCodes = document.querySelectorAll("code:not(.hljs)");
+              inlineCodes.forEach(code => {
+                code.addEventListener("click", () => selectText(code));
               });
             }
           );
