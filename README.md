@@ -1,5 +1,5 @@
-# Wordpress REST Blog
-A simple React-app using Wordpress' REST API.
+# [haakon.dev/#/](https://haakon.dev/)
 
-## private-blog
-This branch is just used for my own personal blog.
+Alt: https://haakon.underbakke.net
+
+Just a tiny wordoress/react blog.
