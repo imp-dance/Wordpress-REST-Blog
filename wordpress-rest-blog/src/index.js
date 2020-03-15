@@ -1,19 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
-import WPConfig from "./WordpressConfig";
 
 const Application = () => {
   return (
-    <BrowserRouter
-      basename={WPConfig.baseName}
-      onUpdate={() => window.scrollTo(0, 0)}
-    >
+    <HashRouter onUpdate={() => window.scrollTo(0, 0)}>
       <App />
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 const root = document.getElementById("root");

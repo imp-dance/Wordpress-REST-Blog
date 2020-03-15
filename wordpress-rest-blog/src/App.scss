@@ -57,6 +57,7 @@ main {
   background: #eee;
   padding: 60px;
   width: 100%;
+  flex: 2;
 }
 .section-2 main {
   background: transparent;
@@ -92,6 +93,13 @@ article h4:before {
   position: relative;
   left: -20px;
   opacity: 0.3;
+}
+article h4 a {
+  color: #000 !important;
+  text-decoration: none;
+}
+body.darkModeBody article h4 a {
+  color: #cac8e4 !important;
 }
 article.open {
   padding-bottom: 60px;
@@ -308,7 +316,7 @@ nav li button.gray {
   align-items: center;
   align-content: center;
   justify-content: center;
-  animation: indexLinksAnimation 2s ease-in-out;
+  animation: indexLinksAnimation 1s ease-in-out;
 }
 .indexLinks div {
   padding: 0 20px 0 0;
@@ -364,11 +372,22 @@ article a {
 article a:hover {
   text-decoration: none;
 }
-
+.wp-block-video {
+  margin: 0;
+  padding: 0;
+}
+article video {
+  max-width: 100%;
+}
 article[data-id="136"] {
   border-bottom: none;
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
+  .wp-block-column {
+    .wp-block-embed {
+      margin: 0px !important;
+    }
+  }
   .wp-block-image {
     float: right;
     padding: 0px;

@@ -117,7 +117,7 @@ class App extends React.Component {
               </div>
             </div>
           </Route>
-          <Route path="/articles">
+          <Route path="/(articles|blog)/">
             <div className="App">
               <Header
                 WPConfig={WPConfig}

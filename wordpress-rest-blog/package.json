@@ -2,7 +2,7 @@
   "name": "wordpress-rest-blog",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://haakon.underbakke.net/blog/",
+  "homepage": "https://haakon.dev/",
   "dependencies": {
     "axios": "^0.19.0",
     "disqus-react": "^1.0.6",

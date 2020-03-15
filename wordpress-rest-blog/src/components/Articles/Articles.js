@@ -21,6 +21,13 @@ import {
   EmailShareButton
 } from "react-share";
 const HtmlToReactParser = require("html-to-react").Parser;
+function camelize(str) {
+  return str
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+      return index === 0 ? word.toLowerCase() : word.toUpperCase();
+    })
+    .replace(/\s+/g, "");
+}
 function selectText(node) {
   if (document.body.createTextRange) {
     const range = document.body.createTextRange();
@@ -103,21 +110,7 @@ class Articles extends React.Component {
               loaded: true
             },
             () => {
-              this.checkForForm();
-              const blockCodes = document.querySelectorAll("pre code");
-              blockCodes.forEach(block => {
-                hljs.highlightBlock(block);
-                const lines = block.innerHTML.split("\n");
-                const newLines = [];
-                lines.forEach(line => {
-                  newLines.push(`<div class="code-line"> ${line}</div>`);
-                });
-                block.innerHTML = newLines.join("\n");
-              });
-              const inlineCodes = document.querySelectorAll("code:not(.hljs)");
-              inlineCodes.forEach(code => {
-                code.addEventListener("click", () => selectText(code));
-              });
+              this.postPageRendered();
             }
           );
         });
@@ -134,6 +127,61 @@ class Articles extends React.Component {
       this.scrollToTop();
     }
   }
+  postPageRendered = () => {
+    this.checkForForm();
+    this.highlightCodes();
+    this.makeHeadersNavigable();
+  };
+  recursiveGetHeaderID = givenID => {
+    if (document.querySelector("#" + givenID) !== null) {
+      const newID = givenID + "_";
+      if (document.querySelector("#" + newID) !== null) {
+        return this.recursiveGetHeaderID(newID);
+      } else {
+        return newID;
+      }
+    }
+    return givenID;
+  };
+  makeHeadersNavigable = () => {
+    const headers = document.querySelectorAll(".body h4");
+    headers.forEach(element => {
+      let newText = camelize(element.innerText);
+      newText = encodeURIComponent(newText.replace("&", "And")).replace(
+        "%",
+        ""
+      );
+      const url = window.location.href;
+      const splitURL = url.split("#");
+      const newURL = splitURL[0] + "#" + splitURL[1];
+      newText = this.recursiveGetHeaderID(newText);
+      element.innerHTML = `<a href="${newURL}#${newText}" name=${newText} id=${newText}>${element.innerText}</a>`;
+      document.querySelector("#" + newText).addEventListener("click", event => {
+        event.target.scrollIntoView();
+        window.scrollBy(0, -100);
+      });
+      if (splitURL[2] === newText) {
+        element.scrollIntoView();
+        window.scrollBy(0, -100);
+      }
+    });
+  };
+  highlightCodes = () => {
+    const blockCodes = document.querySelectorAll("pre code");
+    blockCodes.forEach(block => {
+      hljs.highlightBlock(block);
+      const lines = block.innerHTML.split("\n");
+      const newLines = [];
+      lines.forEach(line => {
+        newLines.push(`<div class="code-line"> ${line}</div>`);
+      });
+      block.innerHTML = newLines.join("\n");
+    });
+    const inlineCodes = document.querySelectorAll("code:not(.hljs)");
+    inlineCodes.forEach(code => {
+      code.addEventListener("click", () => selectText(code));
+    });
+  };
   checkForForm = () => {
     let form = document.querySelector(".wpforms-form");
     if (form !== null) {
@@ -141,7 +189,6 @@ class Articles extends React.Component {
         "action",
         "https://impedans.me/" + form.getAttribute("action")
       );
-      console.log("Updated form");
     }
   };
   goToArticle = event => {
@@ -194,19 +241,9 @@ class Articles extends React.Component {
     window.location.href = "/articles";
   };
   render() {
-    let render = [];
-    render.push(
-      <nav key={"part" + 9991}>
-        <ul>
-          <Categories
-            isOnly={this.state.postID !== false}
-            categories={this.state.categories}
-            sortedArticles={this.state.sortArticles}
-            sortArticles={this.sortArticles}
-          />
-        </ul>
-      </nav>
-    );
+    const afterArticleRender = [];
+    const renderArticles = [];
+    // First loop through all of the posts
     this.state.blogPosts.forEach((blogPost, index) => {
       if (
         this.state.sortArticles === null ||
@@ -217,7 +254,7 @@ class Articles extends React.Component {
           (this.state.postID === false && !blogPost.categories.includes(1)) ||
           this.state.postID !== false
         ) {
-          render.push(
+          renderArticles.push(
             <ArticleBody
               isOnly={this.state.postID !== false}
               blogPost={blogPost}
@@ -228,150 +265,68 @@ class Articles extends React.Component {
       }
     });
     if (this.state.postID !== false) {
-      // A specific post is open
-      // Let's add the meta-data for this specific post
+      // A post is open
+
+      // Here is where you could add after-body content for specific articles
       if (this.state.blogPosts[0].title.rendered !== "") {
-        let metaDescription = this.reactParse(
-          this.state.blogPosts[0].excerpt.rendered
-        );
-        metaDescription = metaDescription.substring(3);
-        metaDescription = metaDescription.slice(0, -5);
-        let title = this.reactParse(this.state.blogPosts[0].title.rendered);
-        render.push(
-          <Helmet key="123653">
-            <title>{title}</title>
-            <meta name="description" content={metaDescription} />
-          </Helmet>
-        );
         if (this.state.postID === "136") {
-          render.push(<h3>Experience timeline</h3>);
-          render.push(
-            <VerticalTimeline layout="1-column">
-              <TimeLineElement
-                title="Ryfylke Kranservice AS"
-                subTitle="https://ryfylkekranservice.no"
-                date="2019"
-                isWork={false}
-              >
-                Designed and developed their new website.
-              </TimeLineElement>
-              <TimeLineElement
-                title="Ida by LIGL"
-                subTitle="https://ida.ligl.no"
-                date="2019"
-                isWork={false}
-              >
-                Released first major version of Ida by LIGL.
-              </TimeLineElement>
-              <TimeLineElement
-                title="LIGL AS"
-                subTitle="Legal Tech Developer"
-                date="2016 - Present"
-                isWork={true}
-              >
-                Legal document automation using ContractExpress, web development
-                & design with React.js
-              </TimeLineElement>
-              <TimeLineElement
-                title="Eirik Underbakke Portfolio"
-                subTitle="https://eirik.underbakke.net"
-                date="2015"
-                isWork={false}
-              >
-                Web Developer, IT, Cashier
-              </TimeLineElement>
-              <TimeLineElement
-                title="Ryfylke Bok & IT"
-                subTitle="https://bok-it.no"
-                date="2014"
-                isWork={false}
-              >
-                Developed their website, also did computer repairs & sales.
-              </TimeLineElement>
-            </VerticalTimeline>
-          );
+          // "About me"-page
+          afterArticleRender.push(<ExperienceTimeline />);
         }
       }
 
       // Let's also show social sharing stuff
-      let url = window.location.href;
       if (this.state.postID !== "136") {
-        if (this.state.postID !== null) {
-          render.push(
-            <div className="footerDate">
-              P{" "}
-              {this.state.blogPosts[0].date !== undefined &&
-                this.parseDate(this.state.blogPosts[0].date)}
-              <br />U{" "}
-              {this.state.blogPosts[0].modified !== undefined &&
-                this.parseDate(this.state.blogPosts[0].modified)}
-            </div>
-          );
-        }
-        render.push(<h5 key={"aaart" + 9994}>Share on...</h5>);
-        render.push(
-          <div className="social" key={"arts" + 9993}>
-            <FacebookShareButton url={url}>Facebook</FacebookShareButton>
-            <RedditShareButton url={url}>Reddit</RedditShareButton>
-            <LinkedinShareButton url={url}>Linkedin</LinkedinShareButton>
-            <TwitterShareButton url={url}>Twitter</TwitterShareButton>
-            <EmailShareButton url={url}>Email</EmailShareButton>
-          </div>
-        );
+        afterArticleRender.push(this.socialSharingRender());
       }
+
       if (!this.state.blogPosts[0].categories.includes(1)) {
         // Post is not hidden
         // Let's now render the comments
-        //// Title
-        if (this.state.comments.length === 1) {
-          render.push(<h4 key={"bbbbart" + 9999}>1 Comment</h4>);
-        } else if (this.state.comments.length === 0) {
-          render.push(
-            <h4 key={"bbbart" + 9999}>Be the first to leave a comment</h4>
-          );
-        } else {
-          render.push(
-            <h4 key={"bbart" + 9999}>{this.state.comments.length} Comments</h4>
-          );
-        }
-        //// Comment Poster
-        render.push(
-          <CommentPoster
-            postID={this.state.postID}
-            onUpdate={this.updateComments}
-            key={9991}
-            WPConfig={this.props.WPConfig}
-            comments={this.state.comments}
-          />
-        );
-        let comments = [];
-        let parentComments = this.state.comments.filter(
-          comment => comment.parent === 0
-        );
-        // Let's first loop through every first-level comment
-        parentComments.forEach((comment, index) => {
-          let parentID = comment.id;
-          let nestedComments = this.state.comments.filter(
-            comment => comment.parent === parentID
-          ); // Also render whatever nested comments are there
-          comments.push(
-            <Comment
-              comment={comment}
-              index={index}
-              key={index}
-              onUpdate={this.updateComments}
-              nestedComments={nestedComments}
-              allComments={this.state.comments}
-            />
-          );
-        });
-        // Pushing comments into "render"
-        render.push(
-          <div className="comments-container" key={9998}>
-            {comments}
-          </div>
-        );
+        afterArticleRender.push(this.commentRender());
       }
+    }
+    const helmetRender = this.helmetRender();
+    return (
+      <React.Fragment>
+        {helmetRender}
+        {!this.state.loaded && (
+          <main className="showLoading">
+            <Loader />
+          </main>
+        )}
+        <main className={this.state.loaded ? "loaded" : "loading"}>
+          <nav key={"part" + 9991}>
+            <ul>
+              <Categories
+                isOnly={this.state.postID !== false}
+                categories={this.state.categories}
+                sortedArticles={this.state.sortArticles}
+                sortArticles={this.sortArticles}
+              />
+            </ul>
+          </nav>
+          {renderArticles}
+          {this.state.postID !== null && afterArticleRender}
+        </main>
+      </React.Fragment>
+    );
+  }
+  helmetRender = () => {
+    const render = [];
+    if (this.state.postID !== false) {
+      let metaDescription = this.reactParse(
+        this.state.blogPosts[0].excerpt.rendered
+      );
+      metaDescription = metaDescription.substring(3);
+      metaDescription = metaDescription.slice(0, -5);
+      let title = this.reactParse(this.state.blogPosts[0].title.rendered);
+      render.push(
+        <Helmet key="123653">
+          <title>{title}</title>
+          <meta name="description" content={metaDescription} />
+        </Helmet>
+      );
     } else {
       // Not a specific post, so we should make sure the meta-info is correct.
       render.push(
@@ -384,24 +339,93 @@ class Articles extends React.Component {
         </Helmet>
       );
     }
-    return (
-      <React.Fragment>
-        {!this.state.loaded && (
-          <main className="showLoading">
-            <Loader />
-          </main>
-        )}
-        <main className={this.state.loaded ? "loaded" : "loading"}>
-          {render}
-        </main>
-      </React.Fragment>
+
+    return render;
+  };
+  commentRender = () => {
+    const commentRender = [];
+    if (this.state.comments.length === 1) {
+      commentRender.push(<h4 key={"bbbbart" + 9999}>1 Comment</h4>);
+    } else if (this.state.comments.length === 0) {
+      commentRender.push(
+        <h4 key={"bbbart" + 9999}>Be the first to leave a comment</h4>
+      );
+    } else {
+      commentRender.push(
+        <h4 key={"bbart" + 9999}>{this.state.comments.length} Comments</h4>
+      );
+    }
+    //// Comment Poster
+    commentRender.push(
+      <CommentPoster
+        postID={this.state.postID}
+        onUpdate={this.updateComments}
+        key={9991}
+        WPConfig={this.props.WPConfig}
+        comments={this.state.comments}
+      />
     );
-  }
+    let comments = [];
+    let parentComments = this.state.comments.filter(
+      comment => comment.parent === 0
+    );
+    // Let's first loop through every first-level comment
+    parentComments.forEach((comment, index) => {
+      let parentID = comment.id;
+      let nestedComments = this.state.comments.filter(
+        comment => comment.parent === parentID
+      ); // Also render whatever nested comments are there
+      comments.push(
+        <Comment
+          comment={comment}
+          index={index}
+          key={index}
+          onUpdate={this.updateComments}
+          nestedComments={nestedComments}
+          allComments={this.state.comments}
+        />
+      );
+    });
+    // Pushing comments into "render"
+    commentRender.push(
+      <div className="comments-container" key={9998}>
+        {comments}
+      </div>
+    );
+    return commentRender;
+  };
+  socialSharingRender = () => {
+    const socialRender = [];
+    const url = window.location.href;
+    if (this.state.postID !== null) {
+      socialRender.push(
+        <div className="footerDate" key="footerDate">
+          P{" "}
+          {this.state.blogPosts[0].date !== undefined &&
+            this.parseDate(this.state.blogPosts[0].date)}
+          <br />U{" "}
+          {this.state.blogPosts[0].modified !== undefined &&
+            this.parseDate(this.state.blogPosts[0].modified)}
+        </div>
+      );
+    }
+    socialRender.push(<h5 key={"aaart" + 9994}>Share on...</h5>);
+    socialRender.push(
+      <div className="social" key={"arts" + 9993}>
+        <FacebookShareButton url={url}>Facebook</FacebookShareButton>
+        <RedditShareButton url={url}>Reddit</RedditShareButton>
+        <LinkedinShareButton url={url}>Linkedin</LinkedinShareButton>
+        <TwitterShareButton url={url}>Twitter</TwitterShareButton>
+        <EmailShareButton url={url}>Email</EmailShareButton>
+      </div>
+    );
+    return socialRender;
+  };
 }
 
 export default Articles;
 
-const ArticleBody = ({ isOnly, key, blogPost }) => {
+const ArticleBody = ({ isOnly, blogPost }) => {
   const className = isOnly ? "open" : "collapsed";
   const goToArticle = event => {
     window.location.href = `${
@@ -422,7 +446,11 @@ const ArticleBody = ({ isOnly, key, blogPost }) => {
     body = body.substring(0, body.length - 9) + "...</p>";
   }
   return (
-    <article key={key} className={className} data-id={blogPost.id}>
+    <article
+      key={`article-${blogPost.id}`}
+      className={className}
+      data-id={blogPost.id}
+    >
       <Link
         to={"/articles/post/" + blogPost.id}
         data-id={blogPost.id}
@@ -525,5 +553,56 @@ const TimeLineElement = ({ title, subTitle, children, date, isWork }) => {
       </h4>
       <p>{children}</p>
     </VerticalTimelineElement>
+  );
+};
+
+const ExperienceTimeline = () => {
+  return (
+    <>
+      <h3>Experience timeline</h3>
+      <VerticalTimeline layout="1-column">
+        <TimeLineElement
+          title="Ryfylke Kranservice AS"
+          subTitle="https://ryfylkekranservice.no"
+          date="2019"
+          isWork={false}
+        >
+          Designed and developed their new website.
+        </TimeLineElement>
+        <TimeLineElement
+          title="Ida by LIGL"
+          subTitle="https://ida.ligl.no"
+          date="2019"
+          isWork={false}
+        >
+          Released first major version of Ida by LIGL.
+        </TimeLineElement>
+        <TimeLineElement
+          title="LIGL AS"
+          subTitle="Legal Tech Developer"
+          date="2016 - Present"
+          isWork={true}
+        >
+          Legal document automation using ContractExpress, web development &
+          design with React.js
+        </TimeLineElement>
+        <TimeLineElement
+          title="Eirik Underbakke Portfolio"
+          subTitle="https://eirik.underbakke.net"
+          date="2015"
+          isWork={false}
+        >
+          Web Developer, IT, Cashier
+        </TimeLineElement>
+        <TimeLineElement
+          title="Ryfylke Bok & IT"
+          subTitle="https://bok-it.no"
+          date="2014"
+          isWork={false}
+        >
+          Developed their website, also did computer repairs & sales.
+        </TimeLineElement>
+      </VerticalTimeline>
+    </>
   );
 };
