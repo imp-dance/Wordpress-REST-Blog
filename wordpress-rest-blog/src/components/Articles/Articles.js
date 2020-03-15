@@ -1,18 +1,14 @@
 import React from "react";
 import ReactDOMServer from "react-dom/server";
-import Comment from "../Comment";
-import CommentPoster from "../CommentPoster";
-import "../../App.scss";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import axios from "axios";
+import CommentPoster from "../CommentPoster";
+import Categories from "../Categories";
+import Comment from "../Comment";
 import Loader from "../Loader";
-import hljs from "highlight.js";
-import {
-  VerticalTimeline,
-  VerticalTimelineElement
-} from "react-vertical-timeline-component";
-import "react-vertical-timeline-component/style.min.css";
+import { camelize, selectText } from "../funcs";
+import { ExperienceTimeline } from "../ExperienceTimeline";
 import {
   FacebookShareButton,
   RedditShareButton,
@@ -20,29 +16,9 @@ import {
   TwitterShareButton,
   EmailShareButton
 } from "react-share";
+import "../../App.scss";
+
 const HtmlToReactParser = require("html-to-react").Parser;
-function camelize(str) {
-  return str
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
-      return index === 0 ? word.toLowerCase() : word.toUpperCase();
-    })
-    .replace(/\s+/g, "");
-}
-function selectText(node) {
-  if (document.body.createTextRange) {
-    const range = document.body.createTextRange();
-    range.moveToElementText(node);
-    range.select();
-  } else if (window.getSelection) {
-    const selection = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(node);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  } else {
-    console.warn("Could not select text in node: Unsupported browser.");
-  }
-}
 
 class Articles extends React.Component {
   state = {
@@ -79,210 +55,68 @@ class Articles extends React.Component {
   };
   componentDidMount() {
     if (this.state.postID === false) {
-      axios
-        .get(`${this.props.WPConfig.siteURL}wp-json/wp/v2/posts/?per_page=100`)
-        .then(res => res.data)
-        .then(blogPosts => {
-          this.setState({
-            blogPosts: blogPosts,
-            loaded: true
-          });
-        });
-      axios
-        .get(`${this.props.WPConfig.siteURL}wp-json/wp/v2/categories`)
-        .then(res => res.data)
-        .then(categories => {
-          this.setState({
-            categories: categories
-          });
-        });
-      this.scrollToTop();
+      // No specific article
+      this.getAllArticles();
     } else {
-      axios
-        .get(
-          `${this.props.WPConfig.siteURL}wp-json/wp/v2/posts/?include[]=${this.state.postID}`
-        )
-        .then(res => res.data)
-        .then(blogPosts => {
-          this.setState(
-            {
-              blogPosts: blogPosts,
-              loaded: true
-            },
-            () => {
-              this.postPageRendered();
-            }
-          );
-        });
-      axios
-        .get(
-          `${this.props.WPConfig.siteURL}wp-json/wp/v2/comments/?post=${this.state.postID}`
-        )
-        .then(res => res.data)
-        .then(comments => {
-          this.setState({
-            comments: comments
-          });
-        });
-      this.scrollToTop();
+      // A specific article
+      this.getSpecificArticle();
     }
   }
-  postPageRendered = () => {
+  postSpecificArticlePageRendered = () => {
     this.checkForForm();
     this.highlightCodes();
     this.makeHeadersNavigable();
   };
-  recursiveGetHeaderID = givenID => {
-    if (document.querySelector("#" + givenID) !== null) {
-      const newID = givenID + "_";
-      if (document.querySelector("#" + newID) !== null) {
-        return this.recursiveGetHeaderID(newID);
-      } else {
-        return newID;
-      }
-    }
-    return givenID;
-  };
-  makeHeadersNavigable = () => {
-    const headers = document.querySelectorAll(".body h4");
-    headers.forEach(element => {
-      let newText = camelize(element.innerText);
-      newText = encodeURIComponent(newText.replace("&", "And")).replace(
-        "%",
-        ""
-      );
-      const url = window.location.href;
-      const splitURL = url.split("#");
-      const newURL = splitURL[0] + "#" + splitURL[1];
-      newText = this.recursiveGetHeaderID(newText);
-      element.innerHTML = `<a href="${newURL}#${newText}" name=${newText} id=${newText}>${element.innerText}</a>`;
-      document.querySelector("#" + newText).addEventListener("click", event => {
-        event.target.scrollIntoView();
-        window.scrollBy(0, -100);
-      });
-      if (splitURL[2] === newText) {
-        element.scrollIntoView();
-        window.scrollBy(0, -100);
-      }
-    });
-  };
-  highlightCodes = () => {
-    const blockCodes = document.querySelectorAll("pre code");
-    blockCodes.forEach(block => {
-      hljs.highlightBlock(block);
-      const lines = block.innerHTML.split("\n");
-      const newLines = [];
-      lines.forEach(line => {
-        newLines.push(`<div class="code-line"> ${line}</div>`);
-      });
-      block.innerHTML = newLines.join("\n");
-    });
-    const inlineCodes = document.querySelectorAll("code:not(.hljs)");
-    inlineCodes.forEach(code => {
-      code.addEventListener("click", () => selectText(code));
-    });
-  };
-  checkForForm = () => {
-    let form = document.querySelector(".wpforms-form");
-    if (form !== null) {
-      form.setAttribute(
-        "action",
-        "https://impedans.me/" + form.getAttribute("action")
-      );
-    }
-  };
-  goToArticle = event => {
-    window.location.href = `${
-      this.props.WPConfig.baseName
-    }post/${event.target.parentElement.getAttribute("data-id")}`;
-  };
-  sortArticles = event => {
-    let categoryID = event.target.getAttribute("data-categoryid");
-    this.setState({ sortArticles: categoryID });
-    this.scrollToTop();
-  };
-  scrollToTop = () => {
-    window.scrollTo(0, 0);
-    document.body.scrollTop = 0;
-  };
-  reactParse = parse => {
-    let HTMLToReactParser = new HtmlToReactParser();
-    let reactElement = HTMLToReactParser.parse(parse);
-    let string = ReactDOMServer.renderToStaticMarkup(reactElement);
-    return string.replace("<code>", "<code class='markUpBaby'>");
-  };
-  parseDate = (date, showHour = false) => {
-    let y = date.substring(0, 4);
-    let m = date.substring(5, 7);
-    let d = date.substring(8, 10);
-    let h = date.substring(11, 13);
-    let min = date.substring(14, 16);
-    return showHour ? `${h}:${min} ${d}/${m}/${y}` : `${d}/${m}/${y}`;
-  };
-  updateComments = newCommentState => {
-    this.setState({ newComments: newCommentState });
-  };
-  goToMusic = () => {
-    window.location.href = "/blog/post/128";
-  };
-  goToAbout = () => {
-    window.location.href = "/blog/post/136";
-  };
-  goToCV = () => {
-    window.open("https://haakon.underbakke.net/cv", "_blank");
-  };
-  goToContact = () => {
-    window.location.href = "https://impedans.me/web/contact-me/";
-  };
-  ignoreAction = event => {
-    event.preventDefault();
-  };
-  goHome = () => {
-    window.location.href = "/articles";
-  };
   render() {
     const afterArticleRender = [];
     const renderArticles = [];
+    const articleIsOpen = this.state.postID !== false;
     // First loop through all of the posts
     this.state.blogPosts.forEach((blogPost, index) => {
-      if (
-        this.state.sortArticles === null ||
+      const articleIsHidden = blogPost.categories.includes(1);
+      const articleMatchesCategory =
         blogPost.categories.includes(parseInt(this.state.sortArticles)) ||
-        blogPost.categories === parseInt(this.state.sortArticles)
-      ) {
+        blogPost.categories === parseInt(this.state.sortArticles);
+      if (!articleIsOpen) {
         if (
-          (this.state.postID === false && !blogPost.categories.includes(1)) ||
-          this.state.postID !== false
+          this.state.sortArticles === null || // Display all articles, no sorting
+          articleMatchesCategory
         ) {
-          renderArticles.push(
-            <ArticleBody
-              isOnly={this.state.postID !== false}
-              blogPost={blogPost}
-              key={index}
-            />
-          );
+          if (!articleIsHidden) {
+            renderArticles.push(
+              <ArticleBody
+                isOnly={articleIsOpen}
+                blogPost={blogPost}
+                key={index}
+              />
+            );
+          }
         }
+      } else {
+        // A specific post is open, so we should definitely render it
+        renderArticles.push(
+          <ArticleBody isOnly={articleIsOpen} blogPost={blogPost} key={index} />
+        );
       }
     });
-    if (this.state.postID !== false) {
-      // A post is open
 
-      // Here is where you could add after-body content for specific articles
-      if (this.state.blogPosts[0].title.rendered !== "") {
-        if (this.state.postID === "136") {
-          // "About me"-page
-          afterArticleRender.push(<ExperienceTimeline />);
-        }
+    // After looping through all of the posts, we now add the post-article stuff, if a specific post is open.
+    if (articleIsOpen) {
+      const articleIsHidden = this.state.blogPosts[0].categories.includes(1);
+      // A specific post is open
+      if (this.state.postID === "136") {
+        // "About me"-page
+        afterArticleRender.push(<ExperienceTimeline />);
       }
 
-      // Let's also show social sharing stuff
+      // Then let's render social sharing stuff
       if (this.state.postID !== "136") {
         afterArticleRender.push(this.socialSharingRender());
       }
 
-      if (!this.state.blogPosts[0].categories.includes(1)) {
+      if (!articleIsHidden) {
         // Post is not hidden
-        // Let's now render the comments
+        // Let's finally render the comments
         afterArticleRender.push(this.commentRender());
       }
     }
@@ -299,7 +133,7 @@ class Articles extends React.Component {
           <nav key={"part" + 9991}>
             <ul>
               <Categories
-                isOnly={this.state.postID !== false}
+                isOnly={articleIsOpen}
                 categories={this.state.categories}
                 sortedArticles={this.state.sortArticles}
                 sortArticles={this.sortArticles}
@@ -421,6 +255,166 @@ class Articles extends React.Component {
     );
     return socialRender;
   };
+
+  getAllArticles = () => {
+    axios
+      .get(`${this.props.WPConfig.siteURL}wp-json/wp/v2/posts/?per_page=100`)
+      .then(res => res.data)
+      .then(blogPosts => {
+        this.setState({
+          blogPosts: blogPosts,
+          loaded: true
+        });
+      });
+    axios
+      .get(`${this.props.WPConfig.siteURL}wp-json/wp/v2/categories`)
+      .then(res => res.data)
+      .then(categories => {
+        this.setState({
+          categories: categories
+        });
+      });
+    this.scrollToTop();
+  };
+  getSpecificArticle = () => {
+    axios
+      .get(
+        `${this.props.WPConfig.siteURL}wp-json/wp/v2/posts/?include[]=${this.state.postID}`
+      )
+      .then(res => res.data)
+      .then(blogPosts => {
+        this.setState(
+          {
+            blogPosts: blogPosts,
+            loaded: true
+          },
+          () => {
+            this.postSpecificArticlePageRendered();
+          }
+        );
+      });
+    axios
+      .get(
+        `${this.props.WPConfig.siteURL}wp-json/wp/v2/comments/?post=${this.state.postID}`
+      )
+      .then(res => res.data)
+      .then(comments => {
+        this.setState({
+          comments: comments
+        });
+      });
+    this.scrollToTop();
+  };
+  recursiveGetHeaderID = givenID => {
+    if (document.querySelector("#" + givenID) !== null) {
+      const newID = givenID + "_";
+      if (document.querySelector("#" + newID) !== null) {
+        return this.recursiveGetHeaderID(newID);
+      } else {
+        return newID;
+      }
+    }
+    return givenID;
+  };
+  makeHeadersNavigable = () => {
+    const headers = document.querySelectorAll(".body h4");
+    headers.forEach(element => {
+      let newText = camelize(element.innerText);
+      newText = encodeURIComponent(newText.replace("&", "And")).replace(
+        "%",
+        ""
+      );
+      const url = window.location.href;
+      const splitURL = url.split("#");
+      const newURL = splitURL[0] + "#" + splitURL[1];
+      newText = this.recursiveGetHeaderID(newText);
+      element.innerHTML = `<a href="${newURL}#${newText}" name=${newText} id=${newText}>${element.innerText}</a>`;
+      document.querySelector("#" + newText).addEventListener("click", event => {
+        event.target.scrollIntoView();
+        window.scrollBy(0, -100);
+      });
+      if (splitURL[2] === newText) {
+        element.scrollIntoView();
+        window.scrollBy(0, -100);
+      }
+    });
+  };
+  highlightCodes = () => {
+    const blockCodes = document.querySelectorAll("pre code");
+    import("highlight.js").then(hljs => {
+      blockCodes.forEach(block => {
+        hljs.highlightBlock(block);
+        const lines = block.innerHTML.split("\n");
+        const newLines = [];
+        lines.forEach(line => {
+          newLines.push(`<div class="code-line"> ${line}</div>`);
+        });
+        block.innerHTML = newLines.join("\n");
+      });
+    });
+    const inlineCodes = document.querySelectorAll("code:not(.hljs)");
+    inlineCodes.forEach(code => {
+      code.addEventListener("click", () => selectText(code));
+    });
+  };
+  checkForForm = () => {
+    let form = document.querySelector(".wpforms-form");
+    if (form !== null) {
+      form.setAttribute(
+        "action",
+        "https://impedans.me/" + form.getAttribute("action")
+      );
+    }
+  };
+  goToArticle = event => {
+    window.location.href = `${
+      this.props.WPConfig.baseName
+    }post/${event.target.parentElement.getAttribute("data-id")}`;
+  };
+  sortArticles = event => {
+    let categoryID = event.target.getAttribute("data-categoryid");
+    this.setState({ sortArticles: categoryID });
+    this.scrollToTop();
+  };
+  scrollToTop = () => {
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+  };
+  reactParse = parse => {
+    let HTMLToReactParser = new HtmlToReactParser();
+    let reactElement = HTMLToReactParser.parse(parse);
+    let string = ReactDOMServer.renderToStaticMarkup(reactElement);
+    return string.replace("<code>", "<code class='markUpBaby'>");
+  };
+  parseDate = (date, showHour = false) => {
+    let y = date.substring(0, 4);
+    let m = date.substring(5, 7);
+    let d = date.substring(8, 10);
+    let h = date.substring(11, 13);
+    let min = date.substring(14, 16);
+    return showHour ? `${h}:${min} ${d}/${m}/${y}` : `${d}/${m}/${y}`;
+  };
+  updateComments = newCommentState => {
+    this.setState({ newComments: newCommentState });
+  };
+  goToMusic = () => {
+    window.location.href = "/blog/post/128";
+  };
+  goToAbout = () => {
+    window.location.href = "/blog/post/136";
+  };
+  goToCV = () => {
+    window.open("https://haakon.underbakke.net/cv", "_blank");
+  };
+  goToContact = () => {
+    window.location.href = "https://impedans.me/web/contact-me/";
+  };
+  ignoreAction = event => {
+    event.preventDefault();
+  };
+  goHome = () => {
+    window.location.href = "/articles";
+  };
 }
 
 export default Articles;
@@ -488,121 +482,5 @@ const ArticleBody = ({ isOnly, blogPost }) => {
         </Link>
       )}
     </article>
-  );
-};
-
-const Categories = ({ categories, sortedArticles, isOnly, sortArticles }) => {
-  let categoryItems = [];
-  categories.forEach((category, index) => {
-    if (category.id !== 1) {
-      categoryItems.push(
-        <li key={"art" + 1888 + index} data-id={category.id}>
-          <button
-            onClick={sortArticles}
-            data-categoryid={category.id}
-            className={
-              sortedArticles === null ||
-              parseInt(sortedArticles) === parseInt(category.id)
-                ? "white"
-                : "gray"
-            }
-          >
-            {category.name}
-          </button>
-        </li>
-      );
-    }
-  });
-  if (isOnly) {
-    categoryItems.push(
-      <li key={"fart" + 1923}>
-        <Link to="/articles">
-          <button>&#8249; Articles</button>
-        </Link>
-      </li>
-    );
-  }
-  return categoryItems;
-};
-
-const TimeLineElement = ({ title, subTitle, children, date, isWork }) => {
-  return (
-    <VerticalTimelineElement
-      className={
-        isWork
-          ? "vertical-timeline-element--work"
-          : "vertical-timeline-element--education"
-      }
-      contentStyle={{ background: "#10101f", color: "#fff" }}
-      contentArrowStyle={{
-        borderRight: isWork ? "7px solid  #10101f" : "7px solid #191931"
-      }}
-      date={date}
-      iconStyle={{ background: "#10101f", color: "#fff" }}
-      icon={<i className="material-icons">{isWork ? "work" : "web"}</i>}
-    >
-      <h3 className="vertical-timeline-element-title">{title}</h3>
-      <h4 className="vertical-timeline-element-subtitle">
-        {isWork ? (
-          subTitle
-        ) : (
-          <a href={subTitle} target="_blank" rel="noopener noreferrer">
-            {subTitle}
-          </a>
-        )}
-      </h4>
-      <p>{children}</p>
-    </VerticalTimelineElement>
-  );
-};
-
-const ExperienceTimeline = () => {
-  return (
-    <>
-      <h3>Experience timeline</h3>
-      <VerticalTimeline layout="1-column">
-        <TimeLineElement
-          title="Ryfylke Kranservice AS"
-          subTitle="https://ryfylkekranservice.no"
-          date="2019"
-          isWork={false}
-        >
-          Designed and developed their new website.
-        </TimeLineElement>
-        <TimeLineElement
-          title="Ida by LIGL"
-          subTitle="https://ida.ligl.no"
-          date="2019"
-          isWork={false}
-        >
-          Released first major version of Ida by LIGL.
-        </TimeLineElement>
-        <TimeLineElement
-          title="LIGL AS"
-          subTitle="Legal Tech Developer"
-          date="2016 - Present"
-          isWork={true}
-        >
-          Legal document automation using ContractExpress, web development &
-          design with React.js
-        </TimeLineElement>
-        <TimeLineElement
-          title="Eirik Underbakke Portfolio"
-          subTitle="https://eirik.underbakke.net"
-          date="2015"
-          isWork={false}
-        >
-          Web Developer, IT, Cashier
-        </TimeLineElement>
-        <TimeLineElement
-          title="Ryfylke Bok & IT"
-          subTitle="https://bok-it.no"
-          date="2014"
-          isWork={false}
-        >
-          Developed their website, also did computer repairs & sales.
-        </TimeLineElement>
-      </VerticalTimeline>
-    </>
   );
 };
